@@ -11806,6 +11806,22 @@ PrefabInstance:
       propertyPath: minDistance
       value: 40
       objectReference: {fileID: 0}
+    - target: {fileID: 3656194152634395858, guid: aa3c65fac5c50d843894154901384dfd, type: 3}
+      propertyPath: rayCount
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 3656194152634395858, guid: aa3c65fac5c50d843894154901384dfd, type: 3}
+      propertyPath: viewAngle
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 3656194152634395858, guid: aa3c65fac5c50d843894154901384dfd, type: 3}
+      propertyPath: viewRadius
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3656194152634395858, guid: aa3c65fac5c50d843894154901384dfd, type: 3}
+      propertyPath: obstacleMask.m_Bits
+      value: 64
+      objectReference: {fileID: 0}
     - target: {fileID: 3793942315154299146, guid: aa3c65fac5c50d843894154901384dfd, type: 3}
       propertyPath: m_IsTrigger
       value: 1
