@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class life : MonoBehaviour
 {
@@ -34,6 +35,12 @@ public class life : MonoBehaviour
             UpdateLifeUI(); // ハートのUIを更新
         }
 
+        // Check if lifePoint is 0, and if so, trigger scene transition
+        if (lifePoint <= 0)
+        {
+            TriggerGameOver(); // ゲームオーバー処理
+        }
+
         // 2秒間スタン状態を維持
         yield return new WaitForSeconds(2f);
 
@@ -56,5 +63,13 @@ public class life : MonoBehaviour
             }
         }
     }
-}
 
+    // ゲームオーバー時にシーン遷移
+    private void TriggerGameOver()
+    {
+        Debug.Log("ゲームオーバー");
+        // ここでゲームオーバー画面や次のシーンに遷移する処理を書く
+        // 例えば、"GameOver"というシーンに遷移する場合
+        SceneManager.LoadScene("ResultScene"); // ゲームオーバーシーンへ遷移
+    }
+}

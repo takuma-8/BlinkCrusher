@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7901038192382307278}
   m_Layer: 0
   m_Name: cap
-  m_TagString: Target
+  m_TagString: cap
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

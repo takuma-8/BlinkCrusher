@@ -49,10 +49,10 @@ public class PlayerConttloer : MonoBehaviour
         }
 
         //ブリンク
-        if ((Input.GetButtonDown("B") || Input.GetKeyDown(KeyCode.Space)) && !isMoving_)
-        {
-            StartMove();
-        }
+      //  if ((Input.GetButtonDown("B") || Input.GetKeyDown(KeyCode.Space)) && !isMoving_)
+      //  {
+      //      StartMove();
+     //   }
 
 
         // Rigidbodyでプレイヤーを動かす
