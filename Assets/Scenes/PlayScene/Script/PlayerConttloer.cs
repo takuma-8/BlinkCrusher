@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerConttloer : MonoBehaviour
 {
+    public GameObject[] BlinkArray = new GameObject[3]; // 最大3つのハート
+    private int BlinkPoint = 3; // ハートの残り数
     public float speed_ = 5.0f;         // 今のスピード
     public float normalSpeed_ = 5.0f;   // 通常時のスピード
     public float blinkSpeed_ = 8.0f;    // ブリンク時のスピード
@@ -17,6 +19,7 @@ public class PlayerConttloer : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
         speed_ = normalSpeed_;
+        UpdateBlinkUI();
     }
 
     // Update is called once per frame
@@ -57,9 +60,13 @@ public class PlayerConttloer : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            StartBlink();
+            if(BlinkPoint != 0)
+            {
+                StartBlink();
+                BlinkPoint--;
+                UpdateBlinkUI();
+            }
         }
-        
     }
 
     private void FixedUpdate()
@@ -67,6 +74,7 @@ public class PlayerConttloer : MonoBehaviour
         if (isMoving_)
         {
             Blink();
+            
         }
     }
 
@@ -77,7 +85,20 @@ public class PlayerConttloer : MonoBehaviour
         　
         isMoving_ = true;
     }
-
+    private void UpdateBlinkUI()
+    {
+        for (int i = 0; i < BlinkArray.Length; i++)
+        {
+            if (i < BlinkPoint)
+            {
+                BlinkArray[i].SetActive(true); // ハートを表示
+            }
+            else
+            {
+                BlinkArray[i].SetActive(false); // ハートを非表示
+            }
+        }
+    }
 
     void Blink()
     {
