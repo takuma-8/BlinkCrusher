@@ -52,7 +52,13 @@ public class PlayerConttloer : MonoBehaviour
         }
 
         // ƒuƒŠƒ“ƒN
-        //if (Input.GetButtonDown("B") && !isMoving_)
+        if (Input.GetButtonDown("B") && !isMoving_)
+        {
+            StartBlink();
+        }
+
+
+        //if (Input.GetKeyDown(KeyCode.Space) && !isMoving_))
         //{
         //    StartBlink();
         //}
