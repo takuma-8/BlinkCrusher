@@ -48,6 +48,12 @@ public class ObjectSpawner : MonoBehaviour
         {
             spawnedObjects.Remove(obj);
             Destroy(obj);
+
+            // Check if all objects are destroyed and trigger spawn if necessary
+            if (spawnedObjects.Count == 0)
+            {
+                SpawnObjects();
+            }
         }
     }
 }
