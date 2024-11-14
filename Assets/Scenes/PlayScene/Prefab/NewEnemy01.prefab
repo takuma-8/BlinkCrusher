@@ -328,9 +328,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6702769802521615717, guid: e574bd9f5ba7c834189b8aee77359ab0, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6731008934556412717}
-    - targetCorrespondingSourceObject: {fileID: 6702769802521615717, guid: e574bd9f5ba7c834189b8aee77359ab0, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3656194152634395858}
   m_SourcePrefab: {fileID: 100100000, guid: e574bd9f5ba7c834189b8aee77359ab0, type: 3}
 --- !u!1 &6108075308194073229 stripped
 GameObject:
@@ -379,24 +376,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &3656194152634395858
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6108075308194073229}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6179c44198de305439229a38c1039d93, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  viewRadius: 5
-  viewAngle: 90
-  rayCount: 50
-  obstacleMask:
-    serializedVersion: 2
-    m_Bits: 0
 --- !u!4 &6885984648465109047 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6219142554629457887, guid: e574bd9f5ba7c834189b8aee77359ab0, type: 3}
