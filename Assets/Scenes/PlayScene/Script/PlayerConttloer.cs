@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class PlayerConttloer : MonoBehaviour
 {
-    public float speed_ = 5.0f;         //今のスピード
-    public float normalSpeed_ = 5.0f;   //通常時のスピード
-    public float blinkSpeed_ = 80.0f;    //ブリンク時のスピード
-    public float distance_ = 1.0f;   // 移動する距離
+    public float speed_ = 5.0f;         // 今のスピード
+    public float normalSpeed_ = 5.0f;   // 通常時のスピード
+    public float blinkSpeed_ = 8.0f;    // ブリンク時のスピード
+    public float distance_ = 1.0f;   // ブリンクで移動する距離
 
     private Rigidbody rb;
     private Vector3 targetPosition_;
@@ -48,19 +48,18 @@ public class PlayerConttloer : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10.0f);
         }
 
-        //ブリンク
-        if ((Input.GetButtonDown("B") || Input.GetKeyDown(KeyCode.Space)) && !isMoving_)
-        {
-            StartMove();
-        }
-
-
-        // Rigidbodyでプレイヤーを動かす
-
-        //if(Input.GetKeyDown(KeyCode.Space) && !isMoving_)
+        // ブリンク
+        //if (Input.GetButtonDown("B") && !isMoving_)
         //{
-        //   StartMove();
+        //    StartBlink();
         //}
+
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            StartBlink();
+        }
+        
     }
 
     private void FixedUpdate()
@@ -69,13 +68,13 @@ public class PlayerConttloer : MonoBehaviour
         {
             Blink();
         }
-
     }
 
-    void StartMove()
+    void StartBlink()
     {
         targetPosition_ = rb.position + transform.forward * distance_;
         speed_ = blinkSpeed_;
+        　
         isMoving_ = true;
     }
 
@@ -85,20 +84,25 @@ public class PlayerConttloer : MonoBehaviour
         Vector3 direction_ = (targetPosition_ - rb.position).normalized;
         rb.MovePosition(rb.position + direction_ * speed_ * Time.fixedDeltaTime);
 
-        //Debug.Log($"Current Position: {rb.position}, Target Position: {targetPosition_}");
+        Debug.Log($"Current Position: {rb.position}, Target Position: {targetPosition_}");
 
-        if (Vector3.Distance(rb.position, targetPosition_) <= 0.2f)
+        if (Vector3.Distance(rb.position, targetPosition_) <= 0.7f)
         {
-            rb.MovePosition(targetPosition_);
+            // 最終位置をセット
+            rb.position = targetPosition_;
+            transform.position = targetPosition_;
 
             rb.velocity = Vector3.zero;        // 移動速度をゼロにリセット
             rb.angularVelocity = Vector3.zero; // 回転速度をゼロにリセット
 
+         
             isMoving_ = false;
+
+            // スピードを戻す
             speed_ = normalSpeed_;
 
             // デバッグで確認
-            //Debug.Log("Blink終了");
+            Debug.Log("Blink終了");
         }
     }
 
