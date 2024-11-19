@@ -1,77 +1,56 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerConttloer : MonoBehaviour
 {
-    public GameObject[] BlinkArray = new GameObject[3]; // 最大3つのハート
-    private int BlinkPoint = 3; // ハートの残り数
-    public float speed_ = 5.0f;         // 今のスピード
-    public float normalSpeed_ = 5.0f;   // 通常時のスピード
-    public float blinkSpeed_ = 8.0f;    // ブリンク時のスピード
-    public float distance_ = 1.0f;   // ブリンクで移動する距離
+    public GameObject[] BlinkArray = new GameObject[3];
+    private int BlinkPoint = 3;
+
+    public float speed_ = 5.0f;
+    public float normalSpeed_ = 5.0f;
+    public float blinkSpeed_ = 8.0f;
+    public float distance_ = 1.0f;
 
     private Rigidbody rb;
     private Vector3 targetPosition_;
-    private bool isMoving_ = false;
+    [HideInInspector] public bool isMoving_ = false;
+
+    private BoxCollider blinkCollider; // ブリンク用の一時コライダー
+    private string originalTag; // 元のタグを保存
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         speed_ = normalSpeed_;
+        originalTag = gameObject.tag; // 元のタグを保存
         UpdateBlinkUI();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        // 入力の取得
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
 
-        // 移動ベクトルの計算
         Vector3 direction = new Vector3(horizontal, 0, vertical).normalized;
 
         if (!isMoving_)
         {
-            // プレイヤー位置の更新
             rb.MovePosition(rb.position + direction * speed_ * Time.deltaTime);
         }
 
         Vector3 movement = new Vector3(horizontal, 0.0f, vertical);
 
-
-
-
-        // プレイヤー回転処理
-        if (movement.magnitude > 0.1f)  // 小さな値だと回転しないらしい
+        if (movement.magnitude > 0.1f)
         {
-            // 移動方向にモデルを回転
             Quaternion targetRotation = Quaternion.LookRotation(movement);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10.0f);
         }
 
-        // ブリンク
-        if (Input.GetButtonDown("B") && !isMoving_)
+        if (Input.GetKeyDown(KeyCode.Space) && BlinkPoint > 0 && !isMoving_)
         {
             StartBlink();
-        }
-
-
-        //if (Input.GetKeyDown(KeyCode.Space) && !isMoving_))
-        //{
-        //    StartBlink();
-        //}
-
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if(BlinkPoint != 0)
-            {
-                StartBlink();
-                BlinkPoint--;
-                UpdateBlinkUI();
-            }
+            BlinkPoint--;
+            UpdateBlinkUI();
         }
     }
 
@@ -80,7 +59,6 @@ public class PlayerConttloer : MonoBehaviour
         if (isMoving_)
         {
             Blink();
-            
         }
     }
 
@@ -88,22 +66,13 @@ public class PlayerConttloer : MonoBehaviour
     {
         targetPosition_ = rb.position + transform.forward * distance_;
         speed_ = blinkSpeed_;
-        　
         isMoving_ = true;
-    }
-    private void UpdateBlinkUI()
-    {
-        for (int i = 0; i < BlinkArray.Length; i++)
-        {
-            if (i < BlinkPoint)
-            {
-                BlinkArray[i].SetActive(true); // ハートを表示
-            }
-            else
-            {
-                BlinkArray[i].SetActive(false); // ハートを非表示
-            }
-        }
+
+        // タグを変更
+        gameObject.tag = "Blink_player";
+
+        // プレイヤーにコライダーを追加
+        AddBlinkCollider();
     }
 
     void Blink()
@@ -111,26 +80,63 @@ public class PlayerConttloer : MonoBehaviour
         Vector3 direction_ = (targetPosition_ - rb.position).normalized;
         rb.MovePosition(rb.position + direction_ * speed_ * Time.fixedDeltaTime);
 
-        Debug.Log($"Current Position: {rb.position}, Target Position: {targetPosition_}");
-
         if (Vector3.Distance(rb.position, targetPosition_) <= 0.7f)
         {
-            // 最終位置をセット
             rb.position = targetPosition_;
             transform.position = targetPosition_;
 
-            rb.velocity = Vector3.zero;        // 移動速度をゼロにリセット
-            rb.angularVelocity = Vector3.zero; // 回転速度をゼロにリセット
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
 
-         
             isMoving_ = false;
-
-            // スピードを戻す
             speed_ = normalSpeed_;
 
-            // デバッグで確認
-            Debug.Log("Blink終了");
+            // タグを元に戻す
+            gameObject.tag = originalTag;
+
+            // コライダーを削除
+            RemoveBlinkCollider();
         }
     }
 
+    private void AddBlinkCollider()
+    {
+        // コライダーを生成
+        blinkCollider = gameObject.AddComponent<BoxCollider>();
+        blinkCollider.isTrigger = true;
+
+        // コライダーのサイズと位置を設定
+        blinkCollider.center = new Vector3(0, 0, 0.75f);
+        blinkCollider.size = new Vector3(1.5f, 1.5f, 1.5f);
+    }
+
+    private void RemoveBlinkCollider()
+    {
+        // コライダーを削除
+        if (blinkCollider != null)
+        {
+            Destroy(blinkCollider);
+        }
+    }
+
+    private void UpdateBlinkUI()
+    {
+        for (int i = 0; i < BlinkArray.Length; i++)
+        {
+            BlinkArray[i].SetActive(i < BlinkPoint);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Enemy1") && isMoving_)
+        {
+            Debug.Log("Enemy hit during Blink!");
+            EnemyController enemyController = other.GetComponent<EnemyController>();
+            if (enemyController != null)
+            {
+                enemyController.Stun();
+            }
+        }
+    }
 }

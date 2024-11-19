@@ -1,3 +1,4 @@
+using System.Net.Sockets;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,6 +9,7 @@ public class ScoreDisplay : MonoBehaviour
 
     void Start()
     {
+
         // ƒXƒRƒA‚ğ‰Šú‰»
         score = DestroyObjectInFront.GetScore();
         UpdateScoreDisplay();

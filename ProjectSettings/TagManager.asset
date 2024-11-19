@@ -12,6 +12,7 @@ TagManager:
   - Zorn
   - cap
   - kabin
+  - Blink_player
   layers:
   - Default
   - TransparentFX

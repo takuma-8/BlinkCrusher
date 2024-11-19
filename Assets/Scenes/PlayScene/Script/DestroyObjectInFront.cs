@@ -16,7 +16,11 @@ public class DestroyObjectInFront : MonoBehaviour
 
     void Update()
     {
-        DetectAndDestroy();
+        // スペースキーまたはコントローラーBボタンが押されたとき
+        if (Input.GetKeyDown(KeyCode.J) || Input.GetButtonDown("Fire2"))
+        {
+            DetectAndDestroy();
+        }
     }
 
     void DetectAndDestroy()
@@ -41,11 +45,11 @@ public class DestroyObjectInFront : MonoBehaviour
                 // タグに応じてスコアを加算
                 if (collider.CompareTag(targetTag1))
                 {
-                    score += 100;  // Target1には10ポイント
+                    score += 100;  // Target1には100ポイント
                 }
                 else if (collider.CompareTag(targetTag2))
                 {
-                    score += 500;   // Target2には5ポイント
+                    score += 500;   // Target2には500ポイント
                 }
 
                 // オブジェクトを破壊
@@ -67,5 +71,10 @@ public class DestroyObjectInFront : MonoBehaviour
     public static int GetScore()
     {
         return score;
+    }
+
+    public static void ResetScore()
+    {
+        score = 0;
     }
 }

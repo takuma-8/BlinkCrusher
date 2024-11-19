@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class CountdownTimer : MonoBehaviour
 {
@@ -19,6 +20,7 @@ public class CountdownTimer : MonoBehaviour
         {
             countdownText.text = "残り時間：0秒";
             // 必要に応じてカウントダウン終了時の処理を追加
+            SceneManager.LoadScene("ResultScene"); // ゲームオーバーシーンへ遷移
         }
     }
 }
