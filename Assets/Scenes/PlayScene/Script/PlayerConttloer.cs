@@ -46,10 +46,9 @@ public class PlayerConttloer : MonoBehaviour
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10.0f);
         }
 
-        if (Input.GetKeyDown(KeyCode.Space) && BlinkPoint > 0 && !isMoving_)
+        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetButtonDown("B")) && BlinkPoint > 0 && !isMoving_)
         {
             StartBlink();
-            BlinkPoint--;
             UpdateBlinkUI();
         }
     }
@@ -64,16 +63,27 @@ public class PlayerConttloer : MonoBehaviour
 
     void StartBlink()
     {
+        // ブリンク先に障害物がないかチェック
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, transform.forward, out hit, distance_))
+        {
+            if (hit.collider.CompareTag("Wall"))
+            {
+                // 壁がある場合、ブリンクをキャンセル
+                Debug.Log("Obstacle detected, Blink cancelled!");
+                return;
+            }
+        }
+
         targetPosition_ = rb.position + transform.forward * distance_;
         speed_ = blinkSpeed_;
         isMoving_ = true;
 
-        // タグを変更
+        rb.isKinematic = true;
         gameObject.tag = "Blink_player";
-
-        // プレイヤーにコライダーを追加
         AddBlinkCollider();
     }
+
 
     void Blink()
     {
@@ -85,19 +95,27 @@ public class PlayerConttloer : MonoBehaviour
             rb.position = targetPosition_;
             transform.position = targetPosition_;
 
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
+            // 角速度の設定を削除
+            // rb.velocity = Vector3.zero;
+            // rb.angularVelocity = Vector3.zero;  // これは削除
 
             isMoving_ = false;
             speed_ = normalSpeed_;
+
+            // Rigidbody の isKinematic を元に戻す
+            rb.isKinematic = false;
 
             // タグを元に戻す
             gameObject.tag = originalTag;
 
             // コライダーを削除
             RemoveBlinkCollider();
+
+            BlinkPoint--;
         }
     }
+
+
 
     private void AddBlinkCollider()
     {
