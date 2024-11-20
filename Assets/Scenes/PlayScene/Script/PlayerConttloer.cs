@@ -43,7 +43,7 @@ public class PlayerConttloer : MonoBehaviour
         if (movement.magnitude > 0.1f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(movement);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10.0f);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 8.0f);
         }
 
         if ((Input.GetKeyDown(KeyCode.Space) || Input.GetButtonDown("B")) && BlinkPoint > 0 && !isMoving_)
@@ -87,17 +87,16 @@ public class PlayerConttloer : MonoBehaviour
 
     void Blink()
     {
-        Vector3 direction_ = (targetPosition_ - rb.position).normalized;
-        rb.MovePosition(rb.position + direction_ * speed_ * Time.fixedDeltaTime);
+        // ブリンク先までの方向を計算
+        Vector3 direction_ = (targetPosition_ - transform.position).normalized;
 
-        if (Vector3.Distance(rb.position, targetPosition_) <= 0.7f)
+        // ブリンク移動を直接transform.positionで行う
+        transform.position = Vector3.MoveTowards(transform.position, targetPosition_, blinkSpeed_ * Time.fixedDeltaTime);
+
+        // 目標位置に十分近づいたら移動を停止
+        if (Vector3.Distance(transform.position, targetPosition_) <= 0.7f)
         {
-            rb.position = targetPosition_;
             transform.position = targetPosition_;
-
-            // 角速度の設定を削除
-            // rb.velocity = Vector3.zero;
-            // rb.angularVelocity = Vector3.zero;  // これは削除
 
             isMoving_ = false;
             speed_ = normalSpeed_;
@@ -111,9 +110,11 @@ public class PlayerConttloer : MonoBehaviour
             // コライダーを削除
             RemoveBlinkCollider();
 
+            // ブリンクの回数を減らす
             BlinkPoint--;
         }
     }
+
 
 
 

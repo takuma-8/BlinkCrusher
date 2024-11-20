@@ -13,6 +13,7 @@ TagManager:
   - cap
   - kabin
   - Blink_player
+  - Wall
   layers:
   - Default
   - TransparentFX
