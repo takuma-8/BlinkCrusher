@@ -17,7 +17,7 @@ public class DestroyObjectInFront : MonoBehaviour
     void Update()
     {
         // スペースキーまたはコントローラーBボタンが押されたとき
-        if (Input.GetKeyDown(KeyCode.J) || Input.GetButtonDown("Fire2"))
+        if (Input.GetKeyDown(KeyCode.J) || Input.GetButtonDown("Fire1"))
         {
             DetectAndDestroy();
         }
