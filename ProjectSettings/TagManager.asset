@@ -14,6 +14,7 @@ TagManager:
   - kabin
   - Blink_player
   - Wall
+  - Ground
   layers:
   - Default
   - TransparentFX
