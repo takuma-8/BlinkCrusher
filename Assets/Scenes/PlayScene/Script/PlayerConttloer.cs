@@ -1,7 +1,15 @@
 using UnityEngine;
-
+using UnityEngine.UI;
 public class PlayerController : MonoBehaviour
 {
+    public Image cooldownCircle; // 円形ゲージ用のUI
+    public Image colorCircle;    // クールタイム中の補助画像
+    public Image Blinkimage;     // 常時表示される画像
+    public RectTransform[] BlinkUIPositions; // ブリンクUIのRectTransform配列
+
+    private bool isCooldown = false; // クールタイム中の状態を管理
+    private float cooldownTimer = 0f; // 現在のクールタイム進行
+    private float coolTime = 30f; // クールタイムの秒数
     public GameObject wallCheck; // wallcheck 子オブジェクト
     public string wallTag = "Wall"; // 壁判定に使用するタグ
 
@@ -13,6 +21,9 @@ public class PlayerController : MonoBehaviour
     public float blinkSpeed_ = 8.0f;
     public float distance_ = 1.0f;
 
+
+
+
     private Rigidbody rb;
     private Vector3 targetPosition_;
     [HideInInspector] public bool isMoving_ = false;
@@ -22,6 +33,12 @@ public class PlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody>();
         speed_ = normalSpeed_;
         UpdateBlinkUI();
+
+        if (colorCircle != null)
+        {
+            colorCircle.enabled = false; // 画像を非表示に設定
+            Blinkimage.enabled = false;
+        }
     }
 
     void Update()
@@ -49,7 +66,10 @@ public class PlayerController : MonoBehaviour
             StartBlink();
             UpdateBlinkUI();
         }
+
+        CoolTime(); // クールタイムの処理を追加
     }
+
 
     private void FixedUpdate()
     {
@@ -92,15 +112,86 @@ public class PlayerController : MonoBehaviour
             StopBlink();
         }
     }
+    void CoolTime()
+    {
+        // BlinkPoint が最大値ではない場合、クールダウンを進行
+        if (BlinkPoint < BlinkArray.Length)
+        {
+            isCooldown = true; // クールダウン中
+            cooldownTimer += Time.deltaTime; // タイマーを進行
+            cooldownCircle.fillAmount = cooldownTimer / coolTime; // ゲージを更新
+
+            if (!colorCircle.enabled)
+            {
+                colorCircle.enabled = true; // クールダウン中の画像を表示
+            }
+
+            if (!Blinkimage.enabled)
+            {
+                Blinkimage.enabled = true; // Blinkimage を表示
+            }
+
+            // BlinkArray の位置にサークルを移動
+            if (BlinkArray.Length > BlinkPoint)
+            {
+                // BlinkArray の位置に cooldownCircle を移動
+                cooldownCircle.rectTransform.position = BlinkArray[BlinkPoint].transform.position;
+
+                // colorCircle と Blinkimage の位置も同様に移動
+                colorCircle.rectTransform.position = BlinkArray[BlinkPoint].transform.position;
+                Blinkimage.rectTransform.position = BlinkArray[BlinkPoint].transform.position;
+            }
+
+            // 一定の透明度に設定（例えば、50%透明に設定）
+            SetBlinkImageTransparency(0.5f); // 透明度を50%に設定
+
+            if (cooldownTimer >= coolTime) // クールタイム完了時
+            {
+                BlinkPoint++; // ポイントを回復
+                cooldownTimer = 0f; // タイマーをリセット
+                UpdateBlinkUI(); // UIを更新
+
+                // 最大値に達した場合、クールダウン終了
+                if (BlinkPoint == BlinkArray.Length)
+                {
+                    cooldownCircle.fillAmount = 0f; // ゲージをリセット
+                    colorCircle.enabled = false; // 画像を非表示
+                    Blinkimage.enabled = false; // Blinkimage を非表示
+                    isCooldown = false;
+                }
+            }
+        }
+        else
+        {
+            // BlinkPoint が最大の場合、クールダウンを無効化
+            isCooldown = false;
+            colorCircle.enabled = false; // 画像を非表示
+            Blinkimage.enabled = true;  // Blinkimage は表示されたまま
+            cooldownCircle.fillAmount = 0f; // ゲージをリセット
+        }
+    }
+
+
+
+
+
 
     void StopBlink()
     {
-        isMoving_ = false; // ブリンク終了
-        speed_ = normalSpeed_; // 通常速度に戻す
-        rb.isKinematic = false; // Rigidbody を元に戻す
-        BlinkPoint--; // ブリンクポイントを減らす
+        isMoving_ = false;
+        speed_ = normalSpeed_;
+        rb.isKinematic = false;
+        BlinkPoint--;
         UpdateBlinkUI();
+
+        if (!isCooldown) // クールタイムが始まっていない場合
+        {
+            isCooldown = true; // クールタイムを開始
+            cooldownTimer = 0f; // タイマーをリセット
+            colorCircle.enabled = true;
+        }
     }
+
 
     private void UpdateBlinkUI()
     {
@@ -123,196 +214,12 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
+    void SetBlinkImageTransparency(float alpha)
+    {
+        Color currentColor = Blinkimage.color;
+        currentColor.a = alpha;  // 透明度を指定された値に設定
+        Blinkimage.color = currentColor;
+    }
+
 }
-
-
-
-
-
-
-
-
-/*
-
-using System.Collections;
-using UnityEngine;
-
-public class PlayerConttloer : MonoBehaviour
-{
-    public GameObject[] BlinkArray = new GameObject[3];
-    private int BlinkPoint = 3;
-
-    public float speed_ = 5.0f;
-    public float normalSpeed_ = 5.0f;
-    public float blinkSpeed_ = 8.0f;
-    public float distance_ = 1.0f;
-
-    private Rigidbody rb;
-    private Vector3 targetPosition_;
-    [HideInInspector] public bool isMoving_ = false;
-
-    private BoxCollider blinkCollider; // ブリンク用の一時コライダー
-    private string originalTag; // 元のタグを保存
-
-    void Start()
-    {
-        rb = GetComponent<Rigidbody>();
-        speed_ = normalSpeed_;
-        originalTag = gameObject.tag; // 元のタグを保存
-        UpdateBlinkUI();
-    }
-
-    void Update()
-    {
-        float horizontal = Input.GetAxis("Horizontal");
-        float vertical = Input.GetAxis("Vertical");
-
-        Vector3 direction = new Vector3(horizontal, 0, vertical).normalized;
-
-        if (!isMoving_)
-        {
-            rb.MovePosition(rb.position + direction * speed_ * Time.deltaTime);
-        }
-
-        Vector3 movement = new Vector3(horizontal, 0.0f, vertical);
-
-        if (movement.magnitude > 0.1f)
-        {
-            Quaternion targetRotation = Quaternion.LookRotation(movement);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 8.0f);
-        }
-
-        if ((Input.GetKeyDown(KeyCode.Space) || Input.GetButtonDown("B")) && BlinkPoint > 0 && !isMoving_)
-        {
-            BlinkPoint--;
-            StartBlink();
-            UpdateBlinkUI();
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        if (isMoving_)
-        {
-            Blink();
-        }
-    }
-
-    void StartBlink()
-    {
-        // ブリンク先に障害物がないかチェック
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit, distance_))
-        {
-            if (hit.collider.CompareTag("Wall"))
-            {
-                // 壁がある場合、ブリンクをキャンセル
-                Debug.Log("Obstacle detected, Blink cancelled!");
-                BlinkPoint++;
-                return;
-            }
-        }
-
-        targetPosition_ = rb.position + transform.forward * distance_;
-        speed_ = blinkSpeed_;
-        isMoving_ = true;
-
-        rb.isKinematic = true;
-        gameObject.tag = "Blink_player";
-        AddBlinkCollider();
-    }
-
-    void Blink()
-    {
-        // ブリンク先までの方向を計算
-        Vector3 direction_ = (targetPosition_ - transform.position).normalized;
-
-        // MovePositionで物理的に移動
-        Vector3 newPosition = Vector3.MoveTowards(transform.position, targetPosition_, blinkSpeed_ * Time.fixedDeltaTime);
-        rb.MovePosition(newPosition);
-
-        // 目標位置に十分近づいたら移動を停止
-        if (Vector3.Distance(transform.position, targetPosition_) <= 0.7f)
-        {
-            rb.MovePosition(targetPosition_);
-            EndBlink();
-        }
-    }
-
-    /*
-    void Blink()
-    {
-        // ブリンク先までの方向を計算
-        Vector3 direction_ = (targetPosition_ - transform.position).normalized;
-
-        // ブリンク移動を直接transform.positionで行う
-        transform.position = Vector3.MoveTowards(transform.position, targetPosition_, blinkSpeed_ * Time.fixedDeltaTime);
-
-        // 目標位置に十分近づいたら移動を停止
-        if (Vector3.Distance(transform.position, targetPosition_) <= 0.7f)
-        {
-            transform.position = targetPosition_;
-
-            isMoving_ = false;
-            speed_ = normalSpeed_;
-
-            // Rigidbody の isKinematic を元に戻す
-            rb.isKinematic = false;
-
-            // タグを元に戻す
-            gameObject.tag = originalTag;
-
-            // コライダーを削除
-            RemoveBlinkCollider();
-
-            
-        }
-        
-    }
-
-
-
-
-    private void AddBlinkCollider()
-    {
-        // コライダーを生成
-        blinkCollider = gameObject.AddComponent<BoxCollider>();
-        blinkCollider.isTrigger = true;
-
-        // コライダーのサイズと位置を設定
-        blinkCollider.center = new Vector3(0, 0, 0.75f);
-        blinkCollider.size = new Vector3(1.5f, 1.5f, 1.5f);
-    }
-
-    private void RemoveBlinkCollider()
-    {
-        // コライダーを削除
-        if (blinkCollider != null)
-        {
-            Destroy(blinkCollider);
-        }
-    }
-
-    private void UpdateBlinkUI()
-    {
-        for (int i = 0; i < BlinkArray.Length; i++)
-        {
-            BlinkArray[i].SetActive(i < BlinkPoint);
-        }
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Enemy1") && isMoving_)
-        {
-            Debug.Log("Enemy hit during Blink!");
-            EnemyController enemyController = other.GetComponent<EnemyController>();
-            if (enemyController != null)
-            {
-                enemyController.Stun();
-            }
-        }
-    }
-}
-*/
-
