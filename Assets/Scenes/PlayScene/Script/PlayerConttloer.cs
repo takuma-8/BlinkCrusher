@@ -113,7 +113,7 @@ public class PlayerController : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         // ブリンク中にエネミーに当たった場合
-        if (other.CompareTag("Enemy1") && isMoving_)
+        if ((other.CompareTag("Enemy1") || other.CompareTag("Enemy2")) && isMoving_)
         {
             Debug.Log("Enemy hit during Blink!");
             EnemyController enemyController = other.GetComponent<EnemyController>();
