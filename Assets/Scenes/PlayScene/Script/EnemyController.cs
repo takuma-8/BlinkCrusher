@@ -4,6 +4,9 @@ using UnityEngine.AI; // NavMeshAgent を使用する場合
 
 public class EnemyController : MonoBehaviour
 {
+    public enum EnemyType { Enemy1, Enemy2 };
+    public EnemyType enemyType;
+
     public GameObject visionObject;       // 視界オブジェクト
     public float stunnedDuration = 10f;  // 気絶時間
     public Material blinkMaterial;       // 点滅時のマテリアル（必須）
@@ -12,6 +15,10 @@ public class EnemyController : MonoBehaviour
     private bool isStunned = false;
     private NavMeshAgent agent;          // NavMeshAgent を使用する場合
     private Renderer enemyRenderer;      // 敵のマテリアルを切り替えるための Renderer
+
+    // Enemy2用のパラメータ
+    public float lifetime = 10f; // 表示される時間（秒）
+    private bool isTemporary; // Enemy2かどうかを判定
 
     private void Start()
     {
@@ -25,6 +32,35 @@ public class EnemyController : MonoBehaviour
         {
             Debug.LogError("Enemy does not have a Renderer component!");
         }
+
+        if(enemyType == EnemyType.Enemy1) 
+        {
+            InitializeEnemy1();
+        }
+        else if(enemyType == EnemyType.Enemy2)
+        {
+            InitializeEnemy2();
+        }
+    }
+
+    private void InitializeEnemy1()
+    {
+        Debug.Log("Enemy1 initialized.");
+        // Enemy1専用の初期化処理（必要なら追加）
+    }
+
+    private void InitializeEnemy2()
+    {
+        Debug.Log("Enemy2 initialized with lifetime.");
+        isTemporary = true;
+        StartCoroutine(DeactivateAfterLifetime(lifetime));
+    }
+
+    private IEnumerator DeactivateAfterLifetime(float time)
+    {
+        yield return new WaitForSeconds(time);
+        gameObject.SetActive(false); // 一時的に非アクティブ化
+        Debug.Log($"{gameObject.name} has disappeared after {time} seconds.");
     }
 
     public void Stun()

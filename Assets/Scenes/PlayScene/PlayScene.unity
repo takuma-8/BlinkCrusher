@@ -267,10 +267,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4649cce4689824648866c02a7c7e7bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyType: 0
   visionObject: {fileID: 2082504800}
   stunnedDuration: 10
   blinkMaterial: {fileID: 2100000, guid: 2ed53e7812625954f8201c930725bf20, type: 2}
   normalMaterial: {fileID: 2100000, guid: 6c4976c9a81d9a0499fd349ebe990c61, type: 2}
+  lifetime: 10
 --- !u!65 &41696222
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1269,10 +1271,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4649cce4689824648866c02a7c7e7bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyType: 0
   visionObject: {fileID: 404106968}
   stunnedDuration: 10
   blinkMaterial: {fileID: 2100000, guid: 2ed53e7812625954f8201c930725bf20, type: 2}
   normalMaterial: {fileID: 2100000, guid: 6c4976c9a81d9a0499fd349ebe990c61, type: 2}
+  lifetime: 10
 --- !u!195 &170351850
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -2697,10 +2701,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4649cce4689824648866c02a7c7e7bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyType: 0
   visionObject: {fileID: 1171978620}
   stunnedDuration: 10
   blinkMaterial: {fileID: 2100000, guid: 2ed53e7812625954f8201c930725bf20, type: 2}
   normalMaterial: {fileID: 2100000, guid: 6c4976c9a81d9a0499fd349ebe990c61, type: 2}
+  lifetime: 10
 --- !u!195 &341009706
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -5116,10 +5122,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4649cce4689824648866c02a7c7e7bf1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enemyType: 0
   visionObject: {fileID: 689158925}
   stunnedDuration: 10
   blinkMaterial: {fileID: 2100000, guid: 2ed53e7812625954f8201c930725bf20, type: 2}
   normalMaterial: {fileID: 2100000, guid: 6c4976c9a81d9a0499fd349ebe990c61, type: 2}
+  lifetime: 10
 --- !u!195 &652642478
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -6388,6 +6396,7 @@ MonoBehaviour:
   detectionRadius: 1
   targetTag1: kabin
   targetTag2: cap
+  enemy2Prefab: {fileID: 3800911735670232025, guid: 51c40e7fa62b3cd449c57086360fdd55, type: 3}
 --- !u!114 &792392888
 MonoBehaviour:
   m_ObjectHideFlags: 0

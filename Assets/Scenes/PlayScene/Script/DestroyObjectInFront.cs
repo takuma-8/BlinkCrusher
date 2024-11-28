@@ -8,10 +8,19 @@ public class DestroyObjectInFront : MonoBehaviour
     private ObjectSpawner objectSpawner;   // ObjectSpawnerの参照
     public static int score = 0;          // 共有スコア変数
 
+    public GameObject enemy2Prefab;        // Enemy2のPrefab
+    private GameObject enemy2Instance;     // 生成されたEnemy2のインスタンス
+
     void Start()
     {
         // ObjectSpawnerのインスタンスを取得
         objectSpawner = FindObjectOfType<ObjectSpawner>();
+
+        // Enemy2Prefabを最初は非アクティブにしておく
+        if (enemy2Prefab != null)
+        {
+            enemy2Prefab.SetActive(false);
+        }
     }
 
     void Update()
@@ -50,6 +59,7 @@ public class DestroyObjectInFront : MonoBehaviour
                 else if (collider.CompareTag(targetTag2))
                 {
                     score += 500;   // Target2には500ポイント
+                    SpawnEnemy2();
                 }
 
                 // オブジェクトを破壊
@@ -58,6 +68,7 @@ public class DestroyObjectInFront : MonoBehaviour
             }
         }
     }
+
 
     // Gizmosで検出範囲を表示
     void OnDrawGizmosSelected()
@@ -77,4 +88,43 @@ public class DestroyObjectInFront : MonoBehaviour
     {
         score = 0;
     }
+
+    // Enemy2を出現させるメソッド
+    void SpawnEnemy2()
+    {
+        // もしすでにEnemy2が出現していたら、もう生成しない
+        //if (enemy2Instance != null)
+        //{
+        //    Debug.Log("Enemy2 is already spawned.");
+        //    return;  // すでに出現していたら何もしない
+        //}
+
+        // Enemy2を指定の位置に生成
+        if (enemy2Prefab != null)
+        {
+            Vector3 spawnPosition = new Vector3(1.0f, 1.0f, 16.0f);  // 初期位置 (1.0, 1.0, 16.0)
+            enemy2Instance = Instantiate(enemy2Prefab, spawnPosition, Quaternion.identity);
+            enemy2Instance.SetActive(true);  // 表示されるようにする
+
+            // Debugログ
+            Debug.Log($"Enemy2 spawned at {spawnPosition}");
+
+            // Enemy2のEnemyControllerに設定
+            var enemyController = enemy2Instance.GetComponent<EnemyController>();
+            if (enemyController != null)
+            {
+                enemyController.enemyType = EnemyController.EnemyType.Enemy2;
+                Debug.Log("Enemy2 initialized with lifetime.");
+            }
+            else
+            {
+                Debug.LogError("Enemy2 prefab is missing EnemyController!");
+            }
+        }
+        else
+        {
+            Debug.LogError("Enemy2 Prefab is not assigned!");
+        }
+    }
+
 }
