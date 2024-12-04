@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class DestroyObjectInFront : MonoBehaviour
@@ -59,7 +60,7 @@ public class DestroyObjectInFront : MonoBehaviour
                 else if (collider.CompareTag(targetTag2))
                 {
                     score += 500;   // Target2には500ポイント
-                    SpawnEnemy2();
+                    StartCoroutine(SpawnEnemy2WithDelay());
                 }
 
                 // オブジェクトを破壊
@@ -102,7 +103,7 @@ public class DestroyObjectInFront : MonoBehaviour
         // Enemy2を指定の位置に生成
         if (enemy2Prefab != null)
         {
-            Vector3 spawnPosition = new Vector3(1.0f, 1.0f, 16.0f);  // 初期位置 (1.0, 1.0, 16.0)
+            Vector3 spawnPosition = new Vector3(44.0f, 1.0f, -2.0f);  // 初期位置 (1.0, 1.0, 16.0)
             enemy2Instance = Instantiate(enemy2Prefab, spawnPosition, Quaternion.identity);
             enemy2Instance.SetActive(true);  // 表示されるようにする
 
@@ -125,6 +126,13 @@ public class DestroyObjectInFront : MonoBehaviour
         {
             Debug.LogError("Enemy2 Prefab is not assigned!");
         }
+    }
+
+    private IEnumerator SpawnEnemy2WithDelay()
+    {
+        yield return new WaitForSeconds(2.0f);
+        Debug.LogError("二秒経ちました Enemy2 が出現します");
+        SpawnEnemy2();
     }
 
 }

@@ -33,7 +33,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 25.36, y: 1.03, z: 7.45}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2170537553569777237}
@@ -167,6 +167,7 @@ MonoBehaviour:
   blinkMaterial: {fileID: 2100000, guid: 8e0602d18987ede4fa38da4f7dc8277e, type: 2}
   normalMaterial: {fileID: 2100000, guid: dc4bcf1c2650a70419e2d44a5f354a39, type: 2}
   lifetime: 10
+  disappearPosition: {x: 44, y: 1, z: 20}
 --- !u!65 &3830057101066244265
 BoxCollider:
   m_ObjectHideFlags: 0

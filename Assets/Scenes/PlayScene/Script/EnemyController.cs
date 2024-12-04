@@ -17,11 +17,17 @@ public class EnemyController : MonoBehaviour
     private Renderer enemyRenderer;      // 敵のマテリアルを切り替えるための Renderer
 
     // Enemy2用のパラメータ
-    public float lifetime = 10f; // 表示される時間（秒）
+    public float lifetime = 10.0f; // 表示される時間（秒）
     private bool isTemporary; // Enemy2かどうかを判定
+    private bool isDisappearing = false; // 消える動作中か判定
+
+    [SerializeField]
+    private Vector3 disappearPosition = new Vector3(44.0f, 1.0f, 20.0f); // Enemy2が消える位置
 
     private void Start()
     {
+        disappearPosition = new Vector3(44.0f, 1.0f, 20.0f);
+
         // NavMeshAgent を取得
         agent = GetComponent<NavMeshAgent>();
 
@@ -52,15 +58,49 @@ public class EnemyController : MonoBehaviour
     private void InitializeEnemy2()
     {
         Debug.Log("Enemy2 initialized with lifetime.");
+        Debug.Log($"Disappear position is set to: {disappearPosition}"); // デバッグ用ログ
         isTemporary = true;
         StartCoroutine(DeactivateAfterLifetime(lifetime));
     }
 
     private IEnumerator DeactivateAfterLifetime(float time)
     {
+        agent.stoppingDistance = 1.0f;
         yield return new WaitForSeconds(time);
-        gameObject.SetActive(false); // 一時的に非アクティブ化
-        Debug.Log($"{gameObject.name} has disappeared after {time} seconds.");
+
+        if (isDisappearing) yield break;
+
+        isDisappearing = true;
+
+        if (agent != null)
+        {
+            // 当たり判定を無効化
+            Collider collider = GetComponent<Collider>();
+            if (collider != null) collider.enabled = false;
+
+            // NavMeshAgent を使用して移動
+            agent.isStopped = false;
+            agent.SetDestination(disappearPosition);
+
+            // 移動中のデバッグ
+            Debug.Log($"{gameObject.name} is moving to disappear position: {disappearPosition}");
+
+            // 所定の位置に到達するまで待機
+            while (agent.pathPending || agent.remainingDistance > agent.stoppingDistance)
+            {
+                Debug.Log($"Remaining Distance: {agent.remainingDistance}, Path Status: {agent.pathStatus}");
+                yield return null;
+            }
+        }
+        else
+        {
+            transform.position = disappearPosition;
+            Debug.Log($"Enemy moved directly to: {disappearPosition}");
+        }
+
+        // 到着後にオブジェクトを削除
+        Debug.Log($"{gameObject.name} has disappeared at position {disappearPosition}.");
+        Destroy(gameObject);
     }
 
     public void Stun()
