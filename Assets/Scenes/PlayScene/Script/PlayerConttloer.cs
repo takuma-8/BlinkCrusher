@@ -20,10 +20,6 @@ public class PlayerController : MonoBehaviour
     public float normalSpeed_ = 5.0f;
     public float blinkSpeed_ = 8.0f;
     public float distance_ = 1.0f;
-
-
-
-
     private Rigidbody rb;
     private Vector3 targetPosition_;
     [HideInInspector] public bool isMoving_ = false;
@@ -70,7 +66,6 @@ public class PlayerController : MonoBehaviour
         CoolTime(); // クールタイムの処理を追加
     }
 
-
     private void FixedUpdate()
     {
         if (isMoving_)
@@ -112,6 +107,7 @@ public class PlayerController : MonoBehaviour
             StopBlink();
         }
     }
+
     void CoolTime()
     {
         // BlinkPoint が最大値ではない場合、クールダウンを進行
@@ -171,11 +167,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
-
-
-
-
     void StopBlink()
     {
         isMoving_ = false;
@@ -191,7 +182,6 @@ public class PlayerController : MonoBehaviour
             colorCircle.enabled = true;
         }
     }
-
 
     private void UpdateBlinkUI()
     {

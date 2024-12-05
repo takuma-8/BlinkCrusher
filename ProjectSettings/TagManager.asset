@@ -15,6 +15,7 @@ TagManager:
   - Blink_player
   - Wall
   - Ground
+  - Secret_Enemy
   layers:
   - Default
   - TransparentFX

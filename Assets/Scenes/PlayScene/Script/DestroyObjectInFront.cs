@@ -90,6 +90,44 @@ public class DestroyObjectInFront : MonoBehaviour
         score = 0;
     }
 
+    void SpawnEnemy2()
+{
+    // もしすでにEnemy2が出現していたら、もう生成しない
+    if (enemy2Instance != null)
+    {
+        Debug.Log("Enemy2 is already spawned.");
+        return;  // すでに出現していたら何もしない
+    }
+
+    // Enemy2を指定の位置に生成
+    if (enemy2Prefab != null)
+    {
+        Vector3 spawnPosition = new Vector3(44.0f, 1.0f, -2.0f);  // 初期位置 (1.0, 1.0, 16.0)
+        enemy2Instance = Instantiate(enemy2Prefab, spawnPosition, Quaternion.identity);
+        enemy2Instance.SetActive(true);  // 表示されるようにする
+
+        // Debugログ
+        Debug.Log($"Enemy2 spawned at {spawnPosition}");
+
+        // Enemy2のEnemyControllerに設定
+        var enemyController = enemy2Instance.GetComponent<EnemyController>();
+        if (enemyController != null)
+        {
+            enemyController.enemyType = EnemyController.EnemyType.Enemy2;
+            Debug.Log("Enemy2 initialized with lifetime.");
+        }
+        else
+        {
+            Debug.LogError("Enemy2 prefab is missing EnemyController!");
+        }
+    }
+    else
+    {
+        Debug.LogError("Enemy2 Prefab is not assigned!");
+    }
+}
+
+   /*
     // Enemy2を出現させるメソッド
     void SpawnEnemy2()
     {
@@ -127,12 +165,12 @@ public class DestroyObjectInFront : MonoBehaviour
             Debug.LogError("Enemy2 Prefab is not assigned!");
         }
     }
-
+   */
     private IEnumerator SpawnEnemy2WithDelay()
     {
         yield return new WaitForSeconds(2.0f);
-        Debug.LogError("二秒経ちました Enemy2 が出現します");
+        Debug.Log("二秒経ちました Enemy2 が出現します");
         SpawnEnemy2();
     }
-
+    
 }
