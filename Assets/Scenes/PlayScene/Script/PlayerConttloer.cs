@@ -1,17 +1,24 @@
 using UnityEngine;
 using UnityEngine.UI;
+
 public class PlayerController : MonoBehaviour
 {
-    public Image cooldownCircle; // 円形ゲージ用のUI
-    public Image colorCircle;    // クールタイム中の補助画像
-    public Image Blinkimage;     // 常時表示される画像
-    public RectTransform[] BlinkUIPositions; // ブリンクUIのRectTransform配列
+    [Header("Blink Parameters")]
+    public float blinkRange = 2.0f;
+    public Vector3 blinkOffset = new Vector3(0, 0, 1.5f);
 
-    private bool isCooldown = false; // クールタイム中の状態を管理
-    private float cooldownTimer = 0f; // 現在のクールタイム進行
-    private float coolTime = 30f; // クールタイムの秒数
-    public GameObject wallCheck; // wallcheck 子オブジェクト
-    public string wallTag = "Wall"; // 壁判定に使用するタグ
+    private bool isBlinking = false;
+    private bool isActionLocked = false; // 破壊中の操作ロック
+    public Image cooldownCircle;
+    public Image colorCircle;
+    public Image Blinkimage;
+    public RectTransform[] BlinkUIPositions;
+
+    private bool isCooldown = false;
+    private float cooldownTimer = 0f;
+    private float coolTime = 30f;
+    public GameObject wallCheck;
+    public string wallTag = "Wall";
 
     public GameObject[] BlinkArray = new GameObject[3];
     private int BlinkPoint = 3;
@@ -32,13 +39,20 @@ public class PlayerController : MonoBehaviour
 
         if (colorCircle != null)
         {
-            colorCircle.enabled = false; // 画像を非表示に設定
+            colorCircle.enabled = false;
             Blinkimage.enabled = false;
         }
     }
 
     void Update()
     {
+        if (isActionLocked) return; // 操作ロック中は何も受け付けない
+
+        if (isBlinking)
+        {
+            DetectEnemiesInBlinkRange();
+        }
+
         float horizontal = Input.GetAxis("Horizontal");
         float vertical = Input.GetAxis("Vertical");
 
@@ -63,11 +77,13 @@ public class PlayerController : MonoBehaviour
             UpdateBlinkUI();
         }
 
-        CoolTime(); // クールタイムの処理を追加
+        CoolTime();
     }
 
     private void FixedUpdate()
     {
+        if (isActionLocked) return; // 操作ロック中は動作しない
+
         if (isMoving_)
         {
             Blink();
@@ -76,32 +92,29 @@ public class PlayerController : MonoBehaviour
 
     void StartBlink()
     {
-        // ブリンクの移動を開始
+        gameObject.tag = "PlayerBlinking";
+        isBlinking = true;
         targetPosition_ = rb.position + transform.forward * distance_;
         speed_ = blinkSpeed_;
-        isMoving_ = true; // ブリンク中の移動フラグを立てる
-        rb.isKinematic = true; // Rigidbody の物理演算を無効化
+        isMoving_ = true;
+        rb.isKinematic = true;
     }
 
     void Blink()
     {
-        // wallcheck が壁に接触しているか判定
         Collider[] hitColliders = Physics.OverlapSphere(wallCheck.transform.position, 0.1f);
         foreach (var hitCollider in hitColliders)
         {
             if (hitCollider.CompareTag(wallTag))
             {
-                // 壁にぶつかった場合、その場で停止
                 Debug.Log("Wall detected, stopping blink!");
                 StopBlink();
                 return;
             }
         }
 
-        // ブリンク移動
         transform.position = Vector3.MoveTowards(transform.position, targetPosition_, blinkSpeed_ * Time.fixedDeltaTime);
 
-        // 目標位置に到達した場合、ブリンクを停止
         if (Vector3.Distance(transform.position, targetPosition_) <= 0.1f)
         {
             StopBlink();
@@ -110,77 +123,109 @@ public class PlayerController : MonoBehaviour
 
     void CoolTime()
     {
-        // BlinkPoint が最大値ではない場合、クールダウンを進行
         if (BlinkPoint < BlinkArray.Length)
         {
-            isCooldown = true; // クールダウン中
-            cooldownTimer += Time.deltaTime; // タイマーを進行
-            cooldownCircle.fillAmount = cooldownTimer / coolTime; // ゲージを更新
+            isCooldown = true;
+            cooldownTimer += Time.deltaTime;
+            cooldownCircle.fillAmount = cooldownTimer / coolTime;
 
             if (!colorCircle.enabled)
             {
-                colorCircle.enabled = true; // クールダウン中の画像を表示
+                colorCircle.enabled = true;
             }
 
             if (!Blinkimage.enabled)
             {
-                Blinkimage.enabled = true; // Blinkimage を表示
+                Blinkimage.enabled = true;
             }
 
-            // BlinkArray の位置にサークルを移動
             if (BlinkArray.Length > BlinkPoint)
             {
-                // BlinkArray の位置に cooldownCircle を移動
                 cooldownCircle.rectTransform.position = BlinkArray[BlinkPoint].transform.position;
-
-                // colorCircle と Blinkimage の位置も同様に移動
                 colorCircle.rectTransform.position = BlinkArray[BlinkPoint].transform.position;
                 Blinkimage.rectTransform.position = BlinkArray[BlinkPoint].transform.position;
             }
 
-            // 一定の透明度に設定（例えば、50%透明に設定）
-            SetBlinkImageTransparency(0.5f); // 透明度を50%に設定
+            SetBlinkImageTransparency(0.5f);
 
-            if (cooldownTimer >= coolTime) // クールタイム完了時
+            if (cooldownTimer >= coolTime)
             {
-                BlinkPoint++; // ポイントを回復
-                cooldownTimer = 0f; // タイマーをリセット
-                UpdateBlinkUI(); // UIを更新
+                BlinkPoint++;
+                cooldownTimer = 0f;
+                UpdateBlinkUI();
 
-                // 最大値に達した場合、クールダウン終了
                 if (BlinkPoint == BlinkArray.Length)
                 {
-                    cooldownCircle.fillAmount = 0f; // ゲージをリセット
-                    colorCircle.enabled = false; // 画像を非表示
-                    Blinkimage.enabled = false; // Blinkimage を非表示
+                    cooldownCircle.fillAmount = 0f;
+                    colorCircle.enabled = false;
+                    Blinkimage.enabled = false;
                     isCooldown = false;
                 }
             }
         }
         else
         {
-            // BlinkPoint が最大の場合、クールダウンを無効化
             isCooldown = false;
-            colorCircle.enabled = false; // 画像を非表示
-            Blinkimage.enabled = true;  // Blinkimage は表示されたまま
-            cooldownCircle.fillAmount = 0f; // ゲージをリセット
+            colorCircle.enabled = false;
+            Blinkimage.enabled = true;
+            cooldownCircle.fillAmount = 0f;
         }
+    }
+
+    public void LockPlayerActions()
+    {
+        isActionLocked = true;
+        rb.isKinematic = true; // 動きを完全に停止
+    }
+
+    public void UnlockPlayerActions()
+    {
+        isActionLocked = false;
+        rb.isKinematic = false; // 動作を再開
     }
 
     void StopBlink()
     {
+        gameObject.tag = "Player";
+        isBlinking = false;
         isMoving_ = false;
         speed_ = normalSpeed_;
         rb.isKinematic = false;
         BlinkPoint--;
         UpdateBlinkUI();
 
-        if (!isCooldown) // クールタイムが始まっていない場合
+        if (!isCooldown)
         {
-            isCooldown = true; // クールタイムを開始
-            cooldownTimer = 0f; // タイマーをリセット
+            isCooldown = true;
+            cooldownTimer = 0f;
             colorCircle.enabled = true;
         }
+    }
+
+    void DetectEnemiesInBlinkRange()
+    {
+        Vector3 detectionCenter = transform.position + transform.TransformDirection(blinkOffset);
+        Collider[] hitColliders = Physics.OverlapSphere(detectionCenter, blinkRange);
+
+        foreach (var hitCollider in hitColliders)
+        {
+            if (hitCollider.CompareTag("Enemy1") || hitCollider.CompareTag("Enemy2"))
+            {
+                Debug.Log("Enemy hit during Blink!");
+                EnemyController enemyController = hitCollider.GetComponent<EnemyController>();
+                if (enemyController != null)
+                {
+                    enemyController.Stun();
+                }
+            }
+        }
+    }
+
+    void OnDrawGizmos()
+    {
+        Gizmos.color = isBlinking ? Color.red : Color.green;
+        Vector3 detectionCenter = transform.position + transform.TransformDirection(blinkOffset);
+        Gizmos.DrawWireSphere(detectionCenter, blinkRange);
     }
 
     private void UpdateBlinkUI()
@@ -191,25 +236,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
-    {
-        // ブリンク中にエネミーに当たった場合
-        if ((other.CompareTag("Enemy1") || other.CompareTag("Enemy2")) && isMoving_)
-        {
-            Debug.Log("Enemy hit during Blink!");
-            EnemyController enemyController = other.GetComponent<EnemyController>();
-            if (enemyController != null)
-            {
-                enemyController.Stun(); // エネミーをスタンさせる処理
-            }
-        }
-    }
-
     void SetBlinkImageTransparency(float alpha)
     {
         Color currentColor = Blinkimage.color;
-        currentColor.a = alpha;  // 透明度を指定された値に設定
+        currentColor.a = alpha;
         Blinkimage.color = currentColor;
     }
-
 }

@@ -16,6 +16,9 @@ TagManager:
   - Wall
   - Ground
   - Secret_Enemy
+  - PlayerBlinking
+  - kabin2
+  - cap2
   layers:
   - Default
   - TransparentFX

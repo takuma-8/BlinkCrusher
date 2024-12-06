@@ -4,10 +4,14 @@ using UnityEngine;
 
 public class ObjectSpawner : MonoBehaviour
 {
-    public GameObject exampleA; // 例Aのプレハブ
-    public GameObject exampleB; // 例Bのプレハブ
+    public GameObject kabin; // 例Aのプレハブ
+    public GameObject cap; // 例Bのプレハブ
     public GameObject[] randomObjects; // ランダムなオブジェクトリスト
     private List<GameObject> spawnedObjects = new List<GameObject>(); // 生成されたオブジェクトを追跡
+    private HashSet<GameObject> usedObjects = new HashSet<GameObject>(); // 使用済みのオブジェクトを追跡
+
+    public GameObject kabin2; // アニメーション付きの例Aプレハブ
+    public GameObject cap2; // アニメーション付きの例Bプレハブ
 
     void Start()
     {
@@ -16,7 +20,6 @@ public class ObjectSpawner : MonoBehaviour
 
     void Update()
     {
-        // 生成したオブジェクトがすべて破棄された場合に再生成
         if (spawnedObjects.Count == 0)
         {
             SpawnObjects();
@@ -25,21 +28,47 @@ public class ObjectSpawner : MonoBehaviour
 
     void SpawnObjects()
     {
-        // 例Aを4つ生成（異なるオブジェクトの上に）
+        usedObjects.Clear(); // 新しいスポーンのたびに使用済みリストをリセット
+
         for (int i = 0; i < 4; i++)
         {
-            // ランダムなオブジェクトを1つ選択
-            GameObject randomObjectA = randomObjects[Random.Range(0, randomObjects.Length)];
-            Vector3 spawnPositionA = randomObjectA.transform.position + Vector3.up;
-            GameObject newObjectA = Instantiate(exampleA, spawnPositionA, Quaternion.identity);
-            spawnedObjects.Add(newObjectA);
+            GameObject randomObjectA = GetUnusedRandomObject();
+            if (randomObjectA != null)
+            {
+                Vector3 spawnPositionA = randomObjectA.transform.position + new Vector3(0, 1, 0);
+                GameObject newObjectA = Instantiate(kabin, spawnPositionA, Quaternion.identity);
+                spawnedObjects.Add(newObjectA);
+                usedObjects.Add(randomObjectA);
+            }
         }
 
-        // 例Bを1つ生成（別のランダムなオブジェクトの上に）
-        GameObject randomObjectB = randomObjects[Random.Range(0, randomObjects.Length)];
-        Vector3 spawnPositionB = randomObjectB.transform.position + Vector3.up;
-        GameObject newObjectB = Instantiate(exampleB, spawnPositionB, Quaternion.identity);
-        spawnedObjects.Add(newObjectB);
+        GameObject randomObjectB = GetUnusedRandomObject();
+        if (randomObjectB != null)
+        {
+            Vector3 spawnPositionB = randomObjectB.transform.position + new Vector3(0, 1, 0);
+            GameObject newObjectB = Instantiate(cap, spawnPositionB, Quaternion.identity);
+            spawnedObjects.Add(newObjectB);
+            usedObjects.Add(randomObjectB);
+        }
+    }
+
+    GameObject GetUnusedRandomObject()
+    {
+        List<GameObject> unusedObjects = new List<GameObject>();
+        foreach (GameObject obj in randomObjects)
+        {
+            if (!usedObjects.Contains(obj))
+            {
+                unusedObjects.Add(obj);
+            }
+        }
+
+        if (unusedObjects.Count > 0)
+        {
+            return unusedObjects[Random.Range(0, unusedObjects.Count)];
+        }
+
+        return null;
     }
 
     public void RemoveSpawnedObject(GameObject obj)
@@ -47,13 +76,35 @@ public class ObjectSpawner : MonoBehaviour
         if (spawnedObjects.Contains(obj))
         {
             spawnedObjects.Remove(obj);
-            Destroy(obj);
 
-            // Check if all objects are destroyed and trigger spawn if necessary
-            if (spawnedObjects.Count == 0)
-            {
-                SpawnObjects();
-            }
+            // アニメーション付きオブジェクトをスポーン
+            StartCoroutine(SpawnAnimationAndDestroy(obj));
+
+            // オブジェクトを破壊
+            Destroy(obj);
+        }
+    }
+
+    private IEnumerator SpawnAnimationAndDestroy(GameObject destroyedObject)
+    {
+        
+
+        // アニメーション付きオブジェクトを生成
+        GameObject animationObject = null;
+        if (destroyedObject.CompareTag("kabin"))
+        {
+            animationObject = Instantiate(kabin2, destroyedObject.transform.position, Quaternion.identity);
+        }
+        else if (destroyedObject.CompareTag("cap"))
+        {
+            animationObject = Instantiate(cap2, destroyedObject.transform.position, Quaternion.identity);
+        }
+
+        // 1秒後にアニメーション付きオブジェクトを削除
+        yield return new WaitForSeconds(1f);
+        if (animationObject != null)
+        {
+            Destroy(animationObject);
         }
     }
 }

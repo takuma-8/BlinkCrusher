@@ -1,32 +1,50 @@
-using System.Collections;
 using UnityEngine;
+using System.Collections;
 
 public class DestroyObjectInFront : MonoBehaviour
 {
-    public float detectionRadius = 1.0f;  // 検出する半径
-    public string targetTag1 = "Target1"; // ターゲット1のタグ
-    public string targetTag2 = "Target2"; // ターゲット2のタグ
-    private ObjectSpawner objectSpawner;   // ObjectSpawnerの参照
-    public static int score = 0;          // 共有スコア変数
+    public float detectionRadius = 1.0f;
+    public string kabin = "kabin";
+    public string cap = "cap";
+    private ObjectSpawner objectSpawner;
+    public static int score = 0;
 
-    public GameObject enemy2Prefab;        // Enemy2のPrefab
-    private GameObject enemy2Instance;     // 生成されたEnemy2のインスタンス
+    public GameObject enemy2Prefab;
+    private GameObject enemy2Instance;
+
+    private bool isFrozen = false;
+    private CharacterController characterController;
+    private Rigidbody playerRigidbody;
+
+    public Camera mainCamera; // 通常時のカメラ
+    public Camera playerCamera; // プレイヤー動作停止中に使うカメラ
+    private MonoBehaviour cameraControlScript; // カメラの制御スクリプト（例: FPSカメラコントローラー）
 
     void Start()
     {
-        // ObjectSpawnerのインスタンスを取得
         objectSpawner = FindObjectOfType<ObjectSpawner>();
+        characterController = GetComponent<CharacterController>();
+        playerRigidbody = GetComponent<Rigidbody>();
 
-        // Enemy2Prefabを最初は非アクティブにしておく
+        // カメラ制御スクリプトを取得 (仮にFPSカメラ用のスクリプトがあると仮定)
+        cameraControlScript = mainCamera?.GetComponent<MonoBehaviour>();
+
         if (enemy2Prefab != null)
         {
             enemy2Prefab.SetActive(false);
+        }
+
+        if (mainCamera != null && playerCamera != null)
+        {
+            mainCamera.enabled = true;
+            playerCamera.enabled = false;
         }
     }
 
     void Update()
     {
-        // スペースキーまたはコントローラーBボタンが押されたとき
+        if (isFrozen) return;
+
         if (Input.GetKeyDown(KeyCode.J) || Input.GetButtonDown("Fire1"))
         {
             DetectAndDestroy();
@@ -35,43 +53,107 @@ public class DestroyObjectInFront : MonoBehaviour
 
     void DetectAndDestroy()
     {
-        // プレイヤーの正面1メートル先の位置を計算
         Vector3 frontPosition = transform.position + transform.forward * detectionRadius;
-
-        // OverlapSphereで指定範囲内のコライダーを取得
         Collider[] colliders = Physics.OverlapSphere(frontPosition, detectionRadius);
 
         foreach (Collider collider in colliders)
         {
-            // タグがTarget1またはTarget2の場合に破壊
-            if (collider.CompareTag(targetTag1) || collider.CompareTag(targetTag2))
+            if (collider.CompareTag(kabin) || collider.CompareTag(cap))
             {
-                // ObjectSpawnerに通知してリストから削除
                 if (objectSpawner != null)
                 {
                     objectSpawner.RemoveSpawnedObject(collider.gameObject);
                 }
 
-                // タグに応じてスコアを加算
-                if (collider.CompareTag(targetTag1))
+                if (collider.CompareTag(kabin))
                 {
-                    score += 100;  // Target1には100ポイント
+                    score += 100;
                 }
-                else if (collider.CompareTag(targetTag2))
+                else if (collider.CompareTag(cap))
                 {
-                    score += 500;   // Target2には500ポイント
+                    score += 500;
                     StartCoroutine(SpawnEnemy2WithDelay());
                 }
 
-                // オブジェクトを破壊
                 Destroy(collider.gameObject);
-                break;  // 1つだけ破壊する
+
+                StartCoroutine(FreezePlayer(1.0f));
+                break;
             }
         }
     }
 
+    private IEnumerator FreezePlayer(float freezeDuration)
+    {
+        isFrozen = true;
 
-    // Gizmosで検出範囲を表示
+        // PlayerController の操作を停止
+        PlayerController playerController = GetComponent<PlayerController>();
+        if (playerController != null)
+        {
+            playerController.LockPlayerActions();
+        }
+
+        // キャラクターコントローラーを無効化
+        if (characterController != null)
+        {
+            characterController.enabled = false;
+        }
+        if (playerRigidbody != null)
+        {
+            playerRigidbody.isKinematic = true;
+            playerRigidbody.velocity = Vector3.zero;
+        }
+
+        // カメラ制御スクリプトを無効化
+        if (cameraControlScript != null)
+        {
+            cameraControlScript.enabled = false;
+        }
+
+        // カメラを切り替え
+        if (mainCamera != null && playerCamera != null)
+        {
+            mainCamera.enabled = false;
+            playerCamera.enabled = true;
+        }
+
+        Debug.Log("Player is frozen, camera switched and control disabled.");
+        yield return new WaitForSeconds(freezeDuration);
+
+        // カメラを元に戻す
+        if (mainCamera != null && playerCamera != null)
+        {
+            mainCamera.enabled = true;
+            playerCamera.enabled = false;
+        }
+
+        // カメラ制御スクリプトを再有効化
+        if (cameraControlScript != null)
+        {
+            cameraControlScript.enabled = true;
+        }
+
+        // キャラクターコントローラーを再有効化
+        if (characterController != null)
+        {
+            characterController.enabled = true;
+        }
+        if (playerRigidbody != null)
+        {
+            playerRigidbody.isKinematic = false;
+        }
+
+        // PlayerController の操作を再開
+        if (playerController != null)
+        {
+            playerController.UnlockPlayerActions();
+        }
+
+        isFrozen = false;
+        Debug.Log("Player can move again, camera restored and control re-enabled.");
+    }
+
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
@@ -79,7 +161,6 @@ public class DestroyObjectInFront : MonoBehaviour
         Gizmos.DrawWireSphere(frontPosition, detectionRadius);
     }
 
-    // 現在のスコアを取得するための静的メソッド
     public static int GetScore()
     {
         return score;
@@ -91,86 +172,25 @@ public class DestroyObjectInFront : MonoBehaviour
     }
 
     void SpawnEnemy2()
-{
-    // もしすでにEnemy2が出現していたら、もう生成しない
-    if (enemy2Instance != null)
     {
-        Debug.Log("Enemy2 is already spawned.");
-        return;  // すでに出現していたら何もしない
-    }
-
-    // Enemy2を指定の位置に生成
-    if (enemy2Prefab != null)
-    {
-        Vector3 spawnPosition = new Vector3(44.0f, 1.0f, -2.0f);  // 初期位置 (1.0, 1.0, 16.0)
-        enemy2Instance = Instantiate(enemy2Prefab, spawnPosition, Quaternion.identity);
-        enemy2Instance.SetActive(true);  // 表示されるようにする
-
-        // Debugログ
-        Debug.Log($"Enemy2 spawned at {spawnPosition}");
-
-        // Enemy2のEnemyControllerに設定
-        var enemyController = enemy2Instance.GetComponent<EnemyController>();
-        if (enemyController != null)
+        if (enemy2Instance != null)
         {
-            enemyController.enemyType = EnemyController.EnemyType.Enemy2;
-            Debug.Log("Enemy2 initialized with lifetime.");
+            Debug.Log("Enemy2 is already spawned.");
+            return;
         }
-        else
-        {
-            Debug.LogError("Enemy2 prefab is missing EnemyController!");
-        }
-    }
-    else
-    {
-        Debug.LogError("Enemy2 Prefab is not assigned!");
-    }
-}
 
-   /*
-    // Enemy2を出現させるメソッド
-    void SpawnEnemy2()
-    {
-        // もしすでにEnemy2が出現していたら、もう生成しない
-        //if (enemy2Instance != null)
-        //{
-        //    Debug.Log("Enemy2 is already spawned.");
-        //    return;  // すでに出現していたら何もしない
-        //}
-
-        // Enemy2を指定の位置に生成
         if (enemy2Prefab != null)
         {
-            Vector3 spawnPosition = new Vector3(44.0f, 1.0f, -2.0f);  // 初期位置 (1.0, 1.0, 16.0)
+            Vector3 spawnPosition = new Vector3(44.0f, 16.0f, 15.0f); // 適切なスポーン位置に変更する
             enemy2Instance = Instantiate(enemy2Prefab, spawnPosition, Quaternion.identity);
-            enemy2Instance.SetActive(true);  // 表示されるようにする
-
-            // Debugログ
-            Debug.Log($"Enemy2 spawned at {spawnPosition}");
-
-            // Enemy2のEnemyControllerに設定
-            var enemyController = enemy2Instance.GetComponent<EnemyController>();
-            if (enemyController != null)
-            {
-                enemyController.enemyType = EnemyController.EnemyType.Enemy2;
-                Debug.Log("Enemy2 initialized with lifetime.");
-            }
-            else
-            {
-                Debug.LogError("Enemy2 prefab is missing EnemyController!");
-            }
-        }
-        else
-        {
-            Debug.LogError("Enemy2 Prefab is not assigned!");
+            enemy2Prefab.SetActive(true);
+            Debug.Log("Enemy2 spawned.");
         }
     }
-   */
-    private IEnumerator SpawnEnemy2WithDelay()
+
+    IEnumerator SpawnEnemy2WithDelay()
     {
-        yield return new WaitForSeconds(2.0f);
-        Debug.Log("二秒経ちました Enemy2 が出現します");
+        yield return new WaitForSeconds(1.0f);
         SpawnEnemy2();
     }
-    
 }
