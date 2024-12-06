@@ -35,7 +35,8 @@ public class ObjectSpawner : MonoBehaviour
             GameObject randomObjectA = GetUnusedRandomObject();
             if (randomObjectA != null)
             {
-                Vector3 spawnPositionA = randomObjectA.transform.position + new Vector3(0, 1, 0);
+                // randomObjectAの位置のx, zをそのままにして、y座標だけを指定 (例: y = 3f)
+                Vector3 spawnPositionA = new Vector3(randomObjectA.transform.position.x, 1f, randomObjectA.transform.position.z);
                 GameObject newObjectA = Instantiate(kabin, spawnPositionA, Quaternion.identity);
                 spawnedObjects.Add(newObjectA);
                 usedObjects.Add(randomObjectA);
@@ -45,12 +46,14 @@ public class ObjectSpawner : MonoBehaviour
         GameObject randomObjectB = GetUnusedRandomObject();
         if (randomObjectB != null)
         {
-            Vector3 spawnPositionB = randomObjectB.transform.position + new Vector3(0, 1, 0);
+            // randomObjectBの位置のx, zをそのままにして、y座標だけを指定 (例: y = 5f)
+            Vector3 spawnPositionB = new Vector3(randomObjectB.transform.position.x, 1f, randomObjectB.transform.position.z);
             GameObject newObjectB = Instantiate(cap, spawnPositionB, Quaternion.identity);
             spawnedObjects.Add(newObjectB);
             usedObjects.Add(randomObjectB);
         }
     }
+
 
     GameObject GetUnusedRandomObject()
     {
@@ -75,8 +78,8 @@ public class ObjectSpawner : MonoBehaviour
     {
         if (spawnedObjects.Contains(obj))
         {
-            spawnedObjects.Remove(obj);
 
+            spawnedObjects.Remove(obj);
             // アニメーション付きオブジェクトをスポーン
             StartCoroutine(SpawnAnimationAndDestroy(obj));
 
@@ -105,6 +108,7 @@ public class ObjectSpawner : MonoBehaviour
         if (animationObject != null)
         {
             Destroy(animationObject);
+            
         }
     }
 }

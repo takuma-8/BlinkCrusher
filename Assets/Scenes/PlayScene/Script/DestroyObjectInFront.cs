@@ -181,16 +181,26 @@ public class DestroyObjectInFront : MonoBehaviour
 
         if (enemy2Prefab != null)
         {
-            Vector3 spawnPosition = new Vector3(44.0f, 16.0f, 15.0f); // 適切なスポーン位置に変更する
+            Vector3 spawnPosition = new Vector3(44.0f, 1.0f, -2.0f);
             enemy2Instance = Instantiate(enemy2Prefab, spawnPosition, Quaternion.identity);
-            enemy2Prefab.SetActive(true);
-            Debug.Log("Enemy2 spawned.");
+            enemy2Instance.SetActive(true);
+
+            var enemyController = enemy2Instance.GetComponent<EnemyController>();
+            if (enemyController != null)
+            {
+                enemyController.enemyType = EnemyController.EnemyType.Enemy2;
+            }
+        }
+        else
+        {
+            Debug.LogError("Enemy2 Prefab is not assigned!");
         }
     }
 
-    IEnumerator SpawnEnemy2WithDelay()
+    private IEnumerator SpawnEnemy2WithDelay()
     {
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(2.0f);
         SpawnEnemy2();
     }
+
 }
