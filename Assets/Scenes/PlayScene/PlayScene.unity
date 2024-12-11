@@ -4171,7 +4171,7 @@ Transform:
   m_GameObject: {fileID: 584708395}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.0011554359, z: 0, w: 0.99999934}
-  m_LocalPosition: {x: 0.0096997805, y: 0.58000004, z: 0.1300229}
+  m_LocalPosition: {x: 0.01, y: 1.26, z: -1.29}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5636,6 +5636,8 @@ MonoBehaviour:
   detectionRadius: 1
   kabin: kabin
   cap: cap
+  sound1: {fileID: 8300000, guid: f9af5cbfd862329438fe9bfa668ee4eb, type: 3}
+  sound2: {fileID: 8300000, guid: 32e77e39a9e6e8743a85a8b76893ebd4, type: 3}
   enemy2Prefab: {fileID: 5764822335468051870, guid: 6779a146ee678b44bbd4fed2935d550e, type: 3}
   mainCamera: {fileID: 584708397}
   playerCamera: {fileID: 1744916148}
