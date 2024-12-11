@@ -4,7 +4,11 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - enemy2Prefab: {fileID: 3800911735670232025, guid: 51c40e7fa62b3cd449c57086360fdd55, type: 3}
+  - sound1: {fileID: 8300000, guid: f9af5cbfd862329438fe9bfa668ee4eb, type: 3}
+  - sound2: {fileID: 8300000, guid: 32e77e39a9e6e8743a85a8b76893ebd4, type: 3}
+  - enemy2Prefab: {instanceID: 0}
+  - mainCamera: {instanceID: 0}
+  - playerCamera: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

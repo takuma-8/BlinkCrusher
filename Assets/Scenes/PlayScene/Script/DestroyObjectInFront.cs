@@ -25,11 +25,11 @@ public class DestroyObjectInFront : MonoBehaviour
 
     void Start()
     {
-        //audioSource = GetComponent<AudioSource>();
-      //  if (audioSource == null)
-      //  {
-      //      Debug.LogError("AudioSource is not attached to the GameObject.");
-     //   }
+        audioSource = GetComponent<AudioSource>();
+        if (audioSource == null)
+        {
+            Debug.LogError("AudioSource is not attached to the GameObject.");
+        }
         objectSpawner = FindObjectOfType<ObjectSpawner>();
         characterController = GetComponent<CharacterController>();
         playerRigidbody = GetComponent<Rigidbody>();
@@ -76,12 +76,13 @@ public class DestroyObjectInFront : MonoBehaviour
                 if (collider.CompareTag(kabin))
                 {
                     score += 100;
-                   // audioSource.PlayOneShot(sound1);
+                    // Œø‰Ê‰¹
+                    audioSource.PlayOneShot(sound1);
                 }
                 else if (collider.CompareTag(cap))
                 {
                     score += 500;
-                   // audioSource.PlayOneShot(sound2);
+                    audioSource.PlayOneShot(sound2);
                     StartCoroutine(SpawnEnemy2WithDelay());
                 }
 
