@@ -33,6 +33,12 @@ public class life : MonoBehaviour
             if (other.gameObject.CompareTag("Zorn") && !isStunned)
             {
                 StartCoroutine(HandleStun()); // スタン処理を開始
+            }else if (other.gameObject.CompareTag("Enemy1") && !isStunned)
+            {
+                StartCoroutine(HandleStun()); // スタン処理を開始
+            }else if (other.gameObject.CompareTag("Enemy2") && !isStunned)
+            {
+                StartCoroutine(HandleStun()); // スタン処理を開始
             }
         }
     }

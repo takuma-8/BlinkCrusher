@@ -174,7 +174,6 @@ public class EnemyController : MonoBehaviour
 
         while (isStunned)
         {
-            // “_–Åó‘Ô‚ğØ‚è‘Ö‚¦
             enemyRenderer.material = isBlinking ? normalMaterial : blinkMaterial;
             isBlinking = !isBlinking;
 

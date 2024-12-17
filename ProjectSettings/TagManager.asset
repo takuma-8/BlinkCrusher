@@ -19,6 +19,7 @@ TagManager:
   - PlayerBlinking
   - kabin2
   - cap2
+  - HidableDesk
   layers:
   - Default
   - TransparentFX
