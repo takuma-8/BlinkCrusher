@@ -22,6 +22,7 @@ public class DestroyObjectInFront : MonoBehaviour
     public Camera mainCamera; // 通常時のカメラ
     public Camera playerCamera; // プレイヤー動作停止中に使うカメラ
     private MonoBehaviour cameraControlScript; // カメラの制御スクリプト（例: FPSカメラコントローラー）
+    private float range = 2.5f;
 
     void Start()
     {
@@ -87,6 +88,9 @@ public class DestroyObjectInFront : MonoBehaviour
                 }
 
                 Destroy(collider.gameObject);
+
+                // 壊れた後に範囲内の敵を反応させる
+                NotifyNearbyEnemies(frontPosition, range); // 半径2.5 (直径5) の範囲
 
                 StartCoroutine(FreezePlayer(1.0f));
                 break;
@@ -165,12 +169,12 @@ public class DestroyObjectInFront : MonoBehaviour
         Debug.Log("Player can move again, camera restored and control re-enabled.");
     }
 
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Vector3 frontPosition = transform.position + transform.forward * detectionRadius;
-        Gizmos.DrawWireSphere(frontPosition, detectionRadius);
-    }
+    //void OnDrawGizmosSelected()
+    //{
+    //    Gizmos.color = Color.red;
+    //    Vector3 frontPosition = transform.position + transform.forward * detectionRadius;
+    //    Gizmos.DrawWireSphere(frontPosition, detectionRadius);
+    //}
 
     public static int GetScore()
     {
@@ -214,4 +218,26 @@ public class DestroyObjectInFront : MonoBehaviour
         SpawnEnemy2();
     }
 
+    void NotifyNearbyEnemies(Vector3 position, float radius)
+    {
+        Collider[] enemies = Physics.OverlapSphere(position, radius);
+
+        foreach (Collider enemyCollider in enemies)
+        {
+            EnemyController enemyController = enemyCollider.GetComponent<EnemyController>();
+            if (enemyController != null)
+            {
+                // 指定位置に移動し、その近辺をうろうろする
+                enemyController.MoveToPositionAndWander(position, 5f, 2f);
+            }
+        }
+    }
+
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = new Color(0, 1, 0, 0.5f); // 半透明の緑
+        Vector3 frontPosition = transform.position + transform.forward * detectionRadius;
+        Gizmos.DrawWireSphere(frontPosition, range); // 反応範囲を描画
+    }
 }
