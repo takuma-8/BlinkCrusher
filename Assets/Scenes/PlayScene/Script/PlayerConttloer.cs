@@ -7,7 +7,7 @@ public class PlayerController : MonoBehaviour
     public float crouchSpeed = 3.0f; // しゃがみ時の移動速度
     public float maxDistanceToWall = 0.5f; // 壁との距離の閾値
     public string wallTag = "Wall";
-    private bool isCrouching = false; // しゃがみ状態
+    public bool isCrouching { get; private set; } // 外部から読み取り可能だが、内部でのみ変更可能
     private bool canStandUp = true;  // しゃがみ解除可能か
 
     private Rigidbody rb;

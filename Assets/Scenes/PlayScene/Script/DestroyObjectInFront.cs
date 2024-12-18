@@ -22,7 +22,7 @@ public class DestroyObjectInFront : MonoBehaviour
     public Camera mainCamera; // 通常時のカメラ
     public Camera playerCamera; // プレイヤー動作停止中に使うカメラ
     private MonoBehaviour cameraControlScript; // カメラの制御スクリプト（例: FPSカメラコントローラー）
-    private float range = 2.5f;
+    private float range = 8f;
 
     void Start()
     {
@@ -62,6 +62,13 @@ public class DestroyObjectInFront : MonoBehaviour
 
     void DetectAndDestroy()
     {
+        PlayerController playerController = GetComponent<PlayerController>();
+        if (playerController != null && playerController.isCrouching)
+        {
+            Debug.Log("しゃがみ中は物を破壊できません。");
+            return; // 処理を中断
+        }
+
         Vector3 frontPosition = transform.position + transform.forward * detectionRadius;
         Collider[] colliders = Physics.OverlapSphere(frontPosition, detectionRadius);
 

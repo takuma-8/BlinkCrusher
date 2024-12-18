@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5636959924584143644}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Clay Kettle Cracked
   m_TagString: cap2
   m_Icon: {fileID: 0}
@@ -85,6 +85,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8399832023047412747, guid: a0418226b14a7514db2b1116de112013, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: -7546972365028445219, guid: a0418226b14a7514db2b1116de112013, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -93,6 +97,26 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 412f36bbc7d4662488575ce0ab4aaf35, type: 2}
+    - target: {fileID: -5819146854236831152, guid: a0418226b14a7514db2b1116de112013, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -4978296314651294965, guid: a0418226b14a7514db2b1116de112013, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -4567024341528714400, guid: a0418226b14a7514db2b1116de112013, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -3900355208795357801, guid: a0418226b14a7514db2b1116de112013, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: -3847742969176218406, guid: a0418226b14a7514db2b1116de112013, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: -3326943352291679052, guid: a0418226b14a7514db2b1116de112013, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -157,6 +181,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Clay Kettle Cracked Body
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a0418226b14a7514db2b1116de112013, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 1052864261498613912, guid: a0418226b14a7514db2b1116de112013, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -180,11 +208,19 @@ PrefabInstance:
     - target: {fileID: 1832555258837176148, guid: a0418226b14a7514db2b1116de112013, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2568858566675521444, guid: a0418226b14a7514db2b1116de112013, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2869902271695215125, guid: a0418226b14a7514db2b1116de112013, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 412f36bbc7d4662488575ce0ab4aaf35, type: 2}
+    - target: {fileID: 3206529338954127294, guid: a0418226b14a7514db2b1116de112013, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 3432596446479562016, guid: a0418226b14a7514db2b1116de112013, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -217,6 +253,10 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 412f36bbc7d4662488575ce0ab4aaf35, type: 2}
+    - target: {fileID: 5792397598259397843, guid: a0418226b14a7514db2b1116de112013, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 6864024610125757378, guid: a0418226b14a7514db2b1116de112013, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -232,6 +272,10 @@ PrefabInstance:
     - target: {fileID: 7009978427703683015, guid: a0418226b14a7514db2b1116de112013, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7591654537903917998, guid: a0418226b14a7514db2b1116de112013, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 7656623259567221124, guid: a0418226b14a7514db2b1116de112013, type: 3}
       propertyPath: m_LocalPosition.x
@@ -910,6 +954,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: f492cfcf7f7901a42a8e0c60879f3d57, type: 3}
       propertyPath: m_Name
       value: Clay Kettle Handle Cracked
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: f492cfcf7f7901a42a8e0c60879f3d57, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
