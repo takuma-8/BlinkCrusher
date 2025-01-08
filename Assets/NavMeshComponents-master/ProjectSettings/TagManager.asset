@@ -3,34 +3,18 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags:
-  - Enemy1
-  - Enemy2
-  - Desk
-  - Target
-  - zorn
-  - Zorn
-  - cap
-  - kabin
-  - Blink_player
-  - Wall
-  - Ground
-  - Secret_Enemy
-  - PlayerBlinking
-  - kabin2
-  - cap2
-  - HidableDesk
+  tags: []
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - hakai
+  - 
   - Water
   - UI
-  - Desk
-  - Enemy1
-  - Enemy2
-  - beck
+  - 
+  - 
+  - 
+  - 
   - 
   - 
   - 
