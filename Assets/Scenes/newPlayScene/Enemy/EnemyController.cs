@@ -7,7 +7,7 @@ public class EnemyController : MonoBehaviour
     public enum EnemyType { Enemy1, Enemy2 };
     public EnemyType enemyType;
 
-    public GameObject visionObject;       // 視界オブジェクト
+ 
     private bool isStunned = false;
     private NavMeshAgent agent;          // NavMeshAgent を使用する場合
     private Renderer enemyRenderer;      // 敵のマテリアルを切り替えるための Renderer
@@ -29,9 +29,6 @@ public class EnemyController : MonoBehaviour
             Debug.LogError("Enemy does not have a Renderer component!");
         }
     }
-
-   
-
  
     public void WanderForSeconds(Vector3 origin, float duration)
     {
@@ -68,26 +65,10 @@ public class EnemyController : MonoBehaviour
         // うろつき終了後、停止させる（必要なら調整）
         agent.SetDestination(transform.position);
     }
-    //public void MoveToPositionAndStop(Vector3 targetPosition)
-    //{
-    //    if (agent == null || isStunned) return;
-
-    //    // NavMeshAgentで指定位置に移動
-    //    agent.SetDestination(targetPosition);
-
-    //    // 停止をチェックするコルーチンを開始
-    //    StartCoroutine(StopAtTargetCoroutine(targetPosition));
-    //}
-
+   
     public void MoveToPositionAndWander(Vector3 targetPosition, float wanderDuration = 5f, float wanderRadius = 2f)
     {
         if (agent == null || isStunned) return;
-
-        ////色を変更
-        //if (enemyRenderer != null)
-        //{
-        //    enemyRenderer.material.color = Color.red;
-        //}
 
         // NavMeshAgentで指定位置に移動
         agent.SetDestination(targetPosition);

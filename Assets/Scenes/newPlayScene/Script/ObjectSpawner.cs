@@ -4,14 +4,12 @@ using UnityEngine;
 
 public class ObjectSpawner : MonoBehaviour
 {
-    public GameObject kabin; // 例Aのプレハブ
-    public GameObject cap; // 例Bのプレハブ
+    public GameObject kabin; // kabinプレハブ
     public GameObject[] randomObjects; // ランダムなオブジェクトリスト
     private List<GameObject> spawnedObjects = new List<GameObject>(); // 生成されたオブジェクトを追跡
     private HashSet<GameObject> usedObjects = new HashSet<GameObject>(); // 使用済みのオブジェクトを追跡
 
-    public GameObject kabin2; // アニメーション付きの例Aプレハブ
-    public GameObject cap2; // アニメーション付きの例Bプレハブ
+    public GameObject kabin2; // アニメーション付きのkabinプレハブ
 
     void Start()
     {
@@ -32,28 +30,17 @@ public class ObjectSpawner : MonoBehaviour
 
         for (int i = 0; i < 4; i++)
         {
-            GameObject randomObjectA = GetUnusedRandomObject();
-            if (randomObjectA != null)
+            GameObject randomObject = GetUnusedRandomObject();
+            if (randomObject != null)
             {
-                // randomObjectAの位置のx, zをそのままにして、y座標だけを指定 (例: y = 3f)
-                Vector3 spawnPositionA = new Vector3(randomObjectA.transform.position.x, 1f, randomObjectA.transform.position.z);
-                GameObject newObjectA = Instantiate(kabin, spawnPositionA, Quaternion.identity);
-                spawnedObjects.Add(newObjectA);
-                usedObjects.Add(randomObjectA);
+                // randomObjectの位置のx, zをそのままにして、y座標だけを指定 (例: y = 1f)
+                Vector3 spawnPosition = new Vector3(randomObject.transform.position.x, 1f, randomObject.transform.position.z);
+                GameObject newObject = Instantiate(kabin, spawnPosition, Quaternion.identity);
+                spawnedObjects.Add(newObject);
+                usedObjects.Add(randomObject);
             }
         }
-
-        GameObject randomObjectB = GetUnusedRandomObject();
-        if (randomObjectB != null)
-        {
-            // randomObjectBの位置のx, zをそのままにして、y座標だけを指定 (例: y = 5f)
-            Vector3 spawnPositionB = new Vector3(randomObjectB.transform.position.x, 1f, randomObjectB.transform.position.z);
-            GameObject newObjectB = Instantiate(cap, spawnPositionB, Quaternion.identity);
-            spawnedObjects.Add(newObjectB);
-            usedObjects.Add(randomObjectB);
-        }
     }
-
 
     GameObject GetUnusedRandomObject()
     {
@@ -78,8 +65,8 @@ public class ObjectSpawner : MonoBehaviour
     {
         if (spawnedObjects.Contains(obj))
         {
-
             spawnedObjects.Remove(obj);
+
             // アニメーション付きオブジェクトをスポーン
             StartCoroutine(SpawnAnimationAndDestroy(obj));
 
@@ -90,25 +77,14 @@ public class ObjectSpawner : MonoBehaviour
 
     private IEnumerator SpawnAnimationAndDestroy(GameObject destroyedObject)
     {
-        
-
         // アニメーション付きオブジェクトを生成
-        GameObject animationObject = null;
-        if (destroyedObject.CompareTag("kabin"))
-        {
-            animationObject = Instantiate(kabin2, destroyedObject.transform.position, Quaternion.identity);
-        }
-        else if (destroyedObject.CompareTag("cap"))
-        {
-            animationObject = Instantiate(cap2, destroyedObject.transform.position, Quaternion.identity);
-        }
+        GameObject animationObject = Instantiate(kabin2, destroyedObject.transform.position, Quaternion.identity);
 
         // 1秒後にアニメーション付きオブジェクトを削除
         yield return new WaitForSeconds(1f);
         if (animationObject != null)
         {
             Destroy(animationObject);
-            
         }
     }
 }
