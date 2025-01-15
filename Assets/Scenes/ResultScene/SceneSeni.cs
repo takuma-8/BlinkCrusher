@@ -10,6 +10,6 @@ public class SceneSeni : MonoBehaviour
     {
         // スコアをリセット
         DestroyObjectInFront.ResetScore();
-        SceneManager.LoadScene("PlayScene");
+        SceneManager.LoadScene("newPlayScene");
     }
 }

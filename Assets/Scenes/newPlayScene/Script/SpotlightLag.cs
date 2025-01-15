@@ -39,12 +39,6 @@ public class SpotlightLag : MonoBehaviour
 
     void LateUpdate()
     {
-        // コントローラーのYボタンでオンオフ切り替え
-        if (Input.GetButtonDown("Fire4"))
-        {
-            isSpotlightOn = !isSpotlightOn;
-            spotlightLight.enabled = isSpotlightOn;
-        }
 
         // ランダムなタイミングでスポットライトを一瞬オフにする
         if (Time.time >= nextRandomOffTime)
