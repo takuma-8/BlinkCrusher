@@ -12,17 +12,11 @@ public class DestroyObjectInFront : MonoBehaviour
     public AudioClip sound2;
     AudioSource audioSource;
 
-    public GameObject enemy2Prefab;
-    private GameObject enemy2Instance;
-
     private bool isFrozen = false;
     private CharacterController characterController;
     private Rigidbody playerRigidbody;
-
-    public Camera mainCamera; // 通常時のカメラ
-    public Camera playerCamera; // プレイヤー動作停止中に使うカメラ
-    private MonoBehaviour cameraControlScript; // カメラの制御スクリプト（例: FPSカメラコントローラー）
-    private float range = 8f;
+    private int range = 8;
+   
 
     void Start()
     {
@@ -34,20 +28,6 @@ public class DestroyObjectInFront : MonoBehaviour
         objectSpawner = FindObjectOfType<ObjectSpawner>();
         characterController = GetComponent<CharacterController>();
         playerRigidbody = GetComponent<Rigidbody>();
-
-        // カメラ制御スクリプトを取得 (仮にFPSカメラ用のスクリプトがあると仮定)
-        cameraControlScript = mainCamera?.GetComponent<MonoBehaviour>();
-
-        if (enemy2Prefab != null)
-        {
-            enemy2Prefab.SetActive(false);
-        }
-
-        if (mainCamera != null && playerCamera != null)
-        {
-            mainCamera.enabled = true;
-            playerCamera.enabled = false;
-        }
     }
 
     void Update()
@@ -63,11 +43,6 @@ public class DestroyObjectInFront : MonoBehaviour
     void DetectAndDestroy()
     {
         PlayerController playerController = GetComponent<PlayerController>();
-        if (playerController != null && playerController.isCrouching)
-        {
-            Debug.Log("しゃがみ中は物を破壊できません。");
-            return; // 処理を中断
-        }
 
         Vector3 frontPosition = transform.position + transform.forward * detectionRadius;
         Collider[] colliders = Physics.OverlapSphere(frontPosition, detectionRadius);
@@ -83,15 +58,14 @@ public class DestroyObjectInFront : MonoBehaviour
 
                 if (collider.CompareTag(kabin))
                 {
-                    score += 100;
+                    score += 1000;
                     // 効果音
                     audioSource.PlayOneShot(sound1);
                 }
                 else if (collider.CompareTag(cap))
                 {
-                    score += 500;
+                    score += 10;
                     audioSource.PlayOneShot(sound2);
-                    StartCoroutine(SpawnEnemy2WithDelay());
                 }
 
                 Destroy(collider.gameObject);
@@ -127,34 +101,10 @@ public class DestroyObjectInFront : MonoBehaviour
             playerRigidbody.velocity = Vector3.zero;
         }
 
-        // カメラ制御スクリプトを無効化
-        if (cameraControlScript != null)
-        {
-            cameraControlScript.enabled = false;
-        }
-
-        // カメラを切り替え
-        if (mainCamera != null && playerCamera != null)
-        {
-            mainCamera.enabled = false;
-            playerCamera.enabled = true;
-        }
+       
 
         Debug.Log("Player is frozen, camera switched and control disabled.");
         yield return new WaitForSeconds(freezeDuration);
-
-        // カメラを元に戻す
-        if (mainCamera != null && playerCamera != null)
-        {
-            mainCamera.enabled = true;
-            playerCamera.enabled = false;
-        }
-
-        // カメラ制御スクリプトを再有効化
-        if (cameraControlScript != null)
-        {
-            cameraControlScript.enabled = true;
-        }
 
         // キャラクターコントローラーを再有効化
         if (characterController != null)
@@ -193,38 +143,6 @@ public class DestroyObjectInFront : MonoBehaviour
         score = 0;
     }
 
-    void SpawnEnemy2()
-    {
-        if (enemy2Instance != null)
-        {
-            Debug.Log("Enemy2 is already spawned.");
-            return;
-        }
-
-        if (enemy2Prefab != null)
-        {
-            Vector3 spawnPosition = new Vector3(44.0f, 1.0f, -2.0f);
-            enemy2Instance = Instantiate(enemy2Prefab, spawnPosition, Quaternion.identity);
-            enemy2Instance.SetActive(true);
-
-            var enemyController = enemy2Instance.GetComponent<EnemyController>();
-            if (enemyController != null)
-            {
-                enemyController.enemyType = EnemyController.EnemyType.Enemy2;
-            }
-        }
-        else
-        {
-            Debug.LogError("Enemy2 Prefab is not assigned!");
-        }
-    }
-
-    private IEnumerator SpawnEnemy2WithDelay()
-    {
-        yield return new WaitForSeconds(2.0f);
-        SpawnEnemy2();
-    }
-
     void NotifyNearbyEnemies(Vector3 position, float radius)
     {
         Collider[] enemies = Physics.OverlapSphere(position, radius);
@@ -239,7 +157,6 @@ public class DestroyObjectInFront : MonoBehaviour
             }
         }
     }
-
 
     void OnDrawGizmosSelected()
     {

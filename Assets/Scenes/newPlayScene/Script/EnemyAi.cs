@@ -7,7 +7,7 @@ public class EnemyAi : MonoBehaviour
     public float detectionRange = 5f;  // プレイヤーを検出する範囲
     public float chaseRange = 10f;     // プレイヤーを追跡する範囲
     public float loseSightTime = 2f;   // プレイヤーが範囲に入らなければ見失うまでの時間
-    public float speed = 5f;         // エネミーの移動速度
+    public float speed = 5f;           // エネミーの移動速度
 
     private Transform player;          // プレイヤーのTransform
     private NavMeshAgent navAgent;     // エネミーのNavMeshAgent
@@ -16,13 +16,25 @@ public class EnemyAi : MonoBehaviour
 
     void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player").transform;  // Playerタグを持つオブジェクトを探す
+        player = GameObject.FindGameObjectWithTag("Player")?.transform;  // Playerタグを持つオブジェクトを探す
+        if (player == null)
+        {
+            Debug.LogWarning("Playerタグを持つオブジェクトが見つかりません！");
+            return;  // Playerが見つからなければ追跡しない
+        }
         navAgent = GetComponent<NavMeshAgent>();  // NavMeshAgentコンポーネントを取得
         navAgent.speed = speed;  // エネミーの移動速度を設定
     }
 
     void Update()
     {
+        if (player == null)
+            return;  // Playerが存在しない場合、処理を中断
+
+        // プレイヤーが"Player"タグを持っているかチェック
+        if (!player.CompareTag("Player"))
+            return;  // "Player"タグがない場合、追跡しない
+
         // プレイヤーとの距離を計算
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 

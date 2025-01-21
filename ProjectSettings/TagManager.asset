@@ -20,6 +20,7 @@ TagManager:
   - kabin2
   - cap2
   - HidableDesk
+  - not_Player
   layers:
   - Default
   - TransparentFX
