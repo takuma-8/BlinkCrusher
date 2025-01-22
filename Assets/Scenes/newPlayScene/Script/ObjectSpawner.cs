@@ -4,12 +4,13 @@ using UnityEngine;
 
 public class ObjectSpawner : MonoBehaviour
 {
-    public GameObject kabin; // kabinプレハブ
+    public GameObject cap; // 通常のアイテムプレハブ (cap)
+    public GameObject kabin; // 高得点アイテムプレハブ (kabin)
     public GameObject[] randomObjects; // ランダムなオブジェクトリスト
     private List<GameObject> spawnedObjects = new List<GameObject>(); // 生成されたオブジェクトを追跡
-    private HashSet<GameObject> usedObjects = new HashSet<GameObject>(); // 使用済みのオブジェクトを追跡
 
-    public GameObject kabin2; // アニメーション付きのkabinプレハブ
+    public GameObject cap2; // 通常アイテム破壊アニメーション (cap2)
+    public GameObject kabin2; // 高得点アイテム破壊アニメーション (kabin2)
 
     void Start()
     {
@@ -26,39 +27,30 @@ public class ObjectSpawner : MonoBehaviour
 
     void SpawnObjects()
     {
-        usedObjects.Clear(); // 新しいスポーンのたびに使用済みリストをリセット
+        // 高得点アイテムを固定位置に配置
+        Vector3 specialObjectPosition = new Vector3(0f, 1.5f, 0f);
+        GameObject specialObject = Instantiate(kabin, specialObjectPosition, Quaternion.identity);
+        specialObject.tag = "kabin";
+        spawnedObjects.Add(specialObject);
 
+        // 通常のアイテムをランダムに配置
         for (int i = 0; i < 4; i++)
         {
-            GameObject randomObject = GetUnusedRandomObject();
-            if (randomObject != null)
-            {
-                // randomObjectの位置のx, zをそのままにして、y座標だけを指定 (例: y = 1f)
-                Vector3 spawnPosition = new Vector3(randomObject.transform.position.x, 1f, randomObject.transform.position.z);
-                GameObject newObject = Instantiate(kabin, spawnPosition, Quaternion.identity);
-                spawnedObjects.Add(newObject);
-                usedObjects.Add(randomObject);
-            }
+            Vector3 spawnPosition = GetRandomPosition();
+            GameObject newObject = Instantiate(cap, spawnPosition, Quaternion.identity);
+            newObject.tag = "cap";
+            spawnedObjects.Add(newObject);
         }
     }
 
-    GameObject GetUnusedRandomObject()
+    Vector3 GetRandomPosition()
     {
-        List<GameObject> unusedObjects = new List<GameObject>();
-        foreach (GameObject obj in randomObjects)
+        if (randomObjects.Length > 0)
         {
-            if (!usedObjects.Contains(obj))
-            {
-                unusedObjects.Add(obj);
-            }
+            GameObject randomObj = randomObjects[Random.Range(0, randomObjects.Length)];
+            return new Vector3(randomObj.transform.position.x, 1.5f, randomObj.transform.position.z);
         }
-
-        if (unusedObjects.Count > 0)
-        {
-            return unusedObjects[Random.Range(0, unusedObjects.Count)];
-        }
-
-        return null;
+        return new Vector3(Random.Range(-5f, 5f), 1.5f, Random.Range(-5f, 5f)); // フォールバックとしてランダム位置
     }
 
     public void RemoveSpawnedObject(GameObject obj)
@@ -66,25 +58,38 @@ public class ObjectSpawner : MonoBehaviour
         if (spawnedObjects.Contains(obj))
         {
             spawnedObjects.Remove(obj);
+            Debug.Log($"Destroyed Object Name: {obj.name}, Tag: {obj.tag}");
 
-            // アニメーション付きオブジェクトをスポーン
-            StartCoroutine(SpawnAnimationAndDestroy(obj));
-
-            // オブジェクトを破壊
+            if (obj.CompareTag("kabin"))
+            {
+                StartCoroutine(SpawnAnimationAndDestroy(obj, kabin2));
+                StartCoroutine(RespawnObjectAfterDelay(obj.transform.position, "kabin", 30f));
+            }
+            else if (obj.CompareTag("cap"))
+            {
+                StartCoroutine(SpawnAnimationAndDestroy(obj, cap2));
+                StartCoroutine(RespawnObjectAfterDelay(GetRandomPosition(), "cap", 30f)); // ランダム位置で再生成
+            }
             Destroy(obj);
         }
     }
 
-    private IEnumerator SpawnAnimationAndDestroy(GameObject destroyedObject)
+    private IEnumerator SpawnAnimationAndDestroy(GameObject destroyedObject, GameObject animationPrefab)
     {
-        // アニメーション付きオブジェクトを生成
-        GameObject animationObject = Instantiate(kabin2, destroyedObject.transform.position, Quaternion.identity);
-
-        // 1秒後にアニメーション付きオブジェクトを削除
+        GameObject animationObject = Instantiate(animationPrefab, destroyedObject.transform.position, Quaternion.identity);
         yield return new WaitForSeconds(1f);
-        if (animationObject != null)
-        {
-            Destroy(animationObject);
-        }
+        Destroy(animationObject);
+    }
+
+    private IEnumerator RespawnObjectAfterDelay(Vector3 position, string type, float delay)
+    {
+        Debug.Log($"Respawning {type} at {position} after {delay} seconds...");
+        yield return new WaitForSeconds(delay);
+
+        GameObject prefabToSpawn = (type == "kabin") ? kabin : cap;
+        GameObject newObject = Instantiate(prefabToSpawn, position, Quaternion.identity);
+        newObject.tag = type;
+        spawnedObjects.Add(newObject);
+        Debug.Log($"{type} respawned at {position}!");
     }
 }
