@@ -21,6 +21,7 @@ TagManager:
   - cap2
   - HidableDesk
   - not_Player
+  - EmperorCamera
   layers:
   - Default
   - TransparentFX

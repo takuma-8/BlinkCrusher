@@ -13,20 +13,119 @@ public class PlayerTeleport : MonoBehaviour
     private PlayerController playerController; // プレイヤーのController
     private bool isEmperor = false; // プレイヤーがエンペラー状態かどうかを管理
     private Vector3 originalPosition; // エンペラー状態前のプレイヤー位置
+    private CameraCollision cameraCollision;
+
+    public Camera playerCamera; // プレイヤーのカメラ（Inspectorから指定）
+    public Camera emperorCamera; // エンペラー状態用カメラ（Inspectorから指定）
 
     private void Start()
     {
+        // PlayerControllerを取得
         playerController = GetComponent<PlayerController>();
-
-        if (targetObjects.Count == 0 || targetColliders.Count == 0 || targetMeshRenderers.Count == 0)
+        if (playerController == null)
         {
-            Debug.LogError("ターゲットオブジェクトのリストが設定されていません！");
+            Debug.LogError("PlayerControllerが見つかりません！このスクリプトをアタッチするGameObjectにPlayerControllerコンポーネントを追加してください。");
+        }
+
+        // CameraCollisionを無効化
+        cameraCollision = FindObjectOfType<CameraCollision>();
+        if (cameraCollision == null)
+        {
+            Debug.LogError("CameraCollisionが見つかりません！シーン内に存在するか確認してください。");
+        }
+        else
+        {
+            cameraCollision.enabled = false; // 初期状態で無効化
+        }
+
+        // プレイヤーカメラとエンペラーカメラが指定されていない場合はエラーメッセージを出す
+        if (playerCamera == null)
+        {
+            Debug.LogError("playerCameraが設定されていません！Inspectorで設定してください。");
+        }
+        if (emperorCamera == null)
+        {
+            Debug.LogError("emperorCameraが設定されていません！Inspectorで設定してください。");
+        }
+    }
+
+    private void EnterEmperorState()
+    {
+        if (playerController == null)
+        {
+            Debug.LogError("playerControllerがnullです。PlayerControllerがアタッチされているか確認してください。");
+            return;
+        }
+
+        originalPosition = transform.position; // エンペラー状態前の位置を記録
+        playerController.LockPlayerActions();
+        playerController.ChangePlayerTag("not_Player");
+        isEmperor = true;
+
+        // カメラの切り替え
+        if (playerCamera != null) playerCamera.gameObject.SetActive(false); // Main Cameraを無効にする
+        if (emperorCamera != null) emperorCamera.gameObject.SetActive(true); // エンペラー用カメラを有効にする
+
+        if (cameraCollision != null)
+        {
+            cameraCollision.enabled = true; // エンペラー状態で有効化
+            cameraCollision.cameraTransform = emperorCamera.transform; // エンペラー用カメラを設定
+        }
+
+        Debug.Log("プレイヤーはエンペラー状態になり、動けなくなりました！");
+    }
+
+    private void ExitEmperorState()
+    {
+        if (playerController == null)
+        {
+            Debug.LogError("playerControllerがnullです。PlayerControllerがアタッチされているか確認してください。");
+            return;
+        }
+
+        playerController.UnlockPlayerActions();
+        playerController.ChangePlayerTag("Player");
+        isEmperor = false;
+
+        // カメラの切り替え
+        if (playerCamera != null) playerCamera.gameObject.SetActive(true); // Main Cameraを再表示
+        if (emperorCamera != null) emperorCamera.gameObject.SetActive(false); // エンペラー用カメラを無効にする
+
+        if (cameraCollision != null)
+        {
+            cameraCollision.enabled = false; // 通常状態で無効化
+        }
+
+        // プレイヤーをエンペラー状態前の位置に戻す
+        transform.position = originalPosition;
+
+        // トリガーオブジェクトの状態を元に戻す
+        RestoreTriggerObjectState();
+
+        Debug.Log("エンペラー状態が解除され、プレイヤーは元の位置に戻りました！");
+    }
+
+    private void RestoreTriggerObjectState()
+    {
+        // すべてのトリガーオブジェクトの状態を元に戻す
+        for (int i = 0; i < targetObjects.Count; i++)
+        {
+            if (targetColliders[i] != null)
+            {
+                targetColliders[i].isTrigger = true; // isTriggerを元に戻す
+            }
+
+            if (targetMeshRenderers[i] != null)
+            {
+                targetMeshRenderers[i].enabled = true; // MeshRendererを元に戻す
+            }
         }
     }
 
     private void Update()
     {
-        if (targetObjects.Count == 0) return;
+        // targetObjectsがnullまたは空でないかを確認
+        if (targetObjects == null || targetObjects.Count == 0) return;
 
         foreach (Transform targetObject in targetObjects)
         {
@@ -41,54 +140,11 @@ public class PlayerTeleport : MonoBehaviour
                 else
                 {
                     EnterEmperorState();
-                    originalPosition = transform.position; // 現在位置を記録
                     TeleportToTarget(targetObject);
                     DisableTriggerObject(targetObject);
                 }
             }
         }
-    }
-
-    private void EnterEmperorState()
-    {
-        playerController.LockPlayerActions();
-        playerController.ChangePlayerTag("not_Player");
-        isEmperor = true;
-
-        for (int i = 0; i < targetColliders.Count; i++)
-        {
-            if (targetColliders[i] != null)
-            {
-                targetColliders[i].isTrigger = true;
-            }
-        }
-
-        Debug.Log("プレイヤーはエンペラー状態になり、動けなくなりました！");
-    }
-
-    private void ExitEmperorState()
-    {
-        playerController.UnlockPlayerActions();
-        playerController.ChangePlayerTag("Player");
-        isEmperor = false;
-
-        transform.position = originalPosition; // 元の位置に戻す
-
-        for (int i = 0; i < targetColliders.Count; i++)
-        {
-            if (targetColliders[i] != null)
-            {
-                targetColliders[i].isTrigger = false;
-                targetColliders[i].enabled = true;
-            }
-
-            if (targetMeshRenderers[i] != null)
-            {
-                targetMeshRenderers[i].enabled = true;
-            }
-        }
-
-        Debug.Log("エンペラー状態が解除され、プレイヤーは元の位置に戻りました！");
     }
 
     private void TeleportToTarget(Transform targetObject)
