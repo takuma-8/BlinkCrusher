@@ -2736,7 +2736,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b3d9d0be3097714cb62a4c46f2accc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  kabin: {fileID: 2143691059763667475, guid: b70342f54aae3854ca585e6ebd30d38f, type: 3}
+  cap: {fileID: 2143691059763667475, guid: b70342f54aae3854ca585e6ebd30d38f, type: 3}
+  kabin: {fileID: 4699808279151307195, guid: f98cec9040ee09542a80c6c7af91c81e, type: 3}
   randomObjects:
   - {fileID: 776615738}
   - {fileID: 1504011668}
@@ -2758,7 +2759,8 @@ MonoBehaviour:
   - {fileID: 1674742091}
   - {fileID: 2026340693}
   - {fileID: 1420652628}
-  kabin2: {fileID: 6881572769840279059, guid: c8c734b9ca4ceb7499cfee1a26b1a2e1, type: 3}
+  cap2: {fileID: 6881572769840279059, guid: c8c734b9ca4ceb7499cfee1a26b1a2e1, type: 3}
+  kabin2: {fileID: 4661971584947106424, guid: bfeb5c1a4234a8f48924cd89081d54e3, type: 3}
 --- !u!1 &543852019
 GameObject:
   m_ObjectHideFlags: 0
@@ -6643,8 +6645,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04121c14775c52540ac9eef69fee430d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  countdownText: {fileID: 986822874}
-  timeRemaining: 151
 --- !u!114 &986822874
 MonoBehaviour:
   m_ObjectHideFlags: 0
