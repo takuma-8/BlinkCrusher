@@ -12,6 +12,8 @@ public class ObjectSpawner : MonoBehaviour
     public GameObject cap2; // 通常アイテム破壊アニメーション (cap2)
     public GameObject kabin2; // 高得点アイテム破壊アニメーション (kabin2)
 
+    private const float minimumDistance = 1.0f; // 重複防止の最小距離
+
     void Start()
     {
         SpawnObjects();
@@ -45,12 +47,41 @@ public class ObjectSpawner : MonoBehaviour
 
     Vector3 GetRandomPosition()
     {
-        if (randomObjects.Length > 0)
+        Vector3 spawnPosition;
+        int maxAttempts = 10; // 位置を再試行する最大回数
+        int attempts = 0;
+
+        do
         {
-            GameObject randomObj = randomObjects[Random.Range(0, randomObjects.Length)];
-            return new Vector3(randomObj.transform.position.x, 1.5f, randomObj.transform.position.z);
+            // ランダムな位置を生成
+            if (randomObjects.Length > 0)
+            {
+                GameObject randomObj = randomObjects[Random.Range(0, randomObjects.Length)];
+                spawnPosition = new Vector3(randomObj.transform.position.x, 1.5f, randomObj.transform.position.z);
+            }
+            else
+            {
+                spawnPosition = new Vector3(Random.Range(-5f, 5f), 1.5f, Random.Range(-5f, 5f)); // フォールバックとしてランダム位置
+            }
+
+            attempts++;
+
+            // 最小距離を満たしていればループを抜ける
+        } while (IsPositionOccupied(spawnPosition) && attempts < maxAttempts);
+
+        return spawnPosition;
+    }
+
+    bool IsPositionOccupied(Vector3 position)
+    {
+        foreach (var obj in spawnedObjects)
+        {
+            if (Vector3.Distance(obj.transform.position, position) < minimumDistance)
+            {
+                return true; // 他のオブジェクトと近すぎる
+            }
         }
-        return new Vector3(Random.Range(-5f, 5f), 1.5f, Random.Range(-5f, 5f)); // フォールバックとしてランダム位置
+        return false; // 十分離れている
     }
 
     public void RemoveSpawnedObject(GameObject obj)
@@ -68,7 +99,7 @@ public class ObjectSpawner : MonoBehaviour
             else if (obj.CompareTag("cap"))
             {
                 StartCoroutine(SpawnAnimationAndDestroy(obj, cap2));
-                StartCoroutine(RespawnObjectAfterDelay(GetRandomPosition(), "cap", 30f)); // ランダム位置で再生成
+                StartCoroutine(RespawnObjectAfterDelay(GetRandomPosition(), "cap", 15f)); // ランダム位置で再生成
             }
             Destroy(obj);
         }
