@@ -7,6 +7,6 @@ public class ResultDisplay : MonoBehaviour
 
     void Start()
     {
-            scoreText.text = "Score: " + DestroyObjectInFront.GetScore().ToString();    
+            scoreText.text = "ÉXÉRÉA: " + DestroyObjectInFront.GetScore().ToString();    
     }
 }
