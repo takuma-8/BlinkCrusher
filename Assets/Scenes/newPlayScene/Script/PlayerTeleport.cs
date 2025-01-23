@@ -48,6 +48,17 @@ public class PlayerTeleport : MonoBehaviour
             Debug.LogError("emperorCameraが設定されていません！Inspectorで設定してください。");
         }
     }
+    private bool IsPositionBlocked(Vector3 position)
+    {
+        // プレイヤーのキャラクターのサイズを考慮したレイキャスト
+        RaycastHit hit;
+        float playerHeight = 2f;  // プレイヤーの高さ（適切な値を設定）
+        if (Physics.Raycast(position + Vector3.up * playerHeight * 0.5f, Vector3.down, out hit, collisionCheckDistance + playerHeight))
+        {
+            return true; // 衝突があれば位置がブロックされている
+        }
+        return false;
+    }
 
     private void EnterEmperorState()
     {
@@ -161,15 +172,7 @@ public class PlayerTeleport : MonoBehaviour
         Debug.Log("プレイヤーが移動しました！ 新しい位置: " + transform.position);
     }
 
-    private bool IsPositionBlocked(Vector3 position)
-    {
-        RaycastHit hit;
-        if (Physics.Raycast(position, Vector3.down, out hit, collisionCheckDistance))
-        {
-            return true;
-        }
-        return false;
-    }
+    
 
     private Vector3 GetSafePosition(Vector3 targetPosition)
     {
@@ -209,4 +212,10 @@ public class PlayerTeleport : MonoBehaviour
         Gizmos.color = Color.green;
         Gizmos.DrawWireSphere(transform.position, triggerRange);
     }
+
+    public bool IsEmperor()
+    {
+        return isEmperor;
+    }
+
 }

@@ -64,7 +64,7 @@ public class DestroyObjectInFront : MonoBehaviour
                 }
                 else if (collider.CompareTag(cap))
                 {
-                    score += 10;
+                    score += 100;
                     audioSource.PlayOneShot(sound2);
                 }
 
