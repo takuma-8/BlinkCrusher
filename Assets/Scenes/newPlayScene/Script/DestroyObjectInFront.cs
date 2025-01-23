@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+[System.Serializable]
 
 public class DestroyObjectInFront : MonoBehaviour
 {
@@ -58,7 +59,7 @@ public class DestroyObjectInFront : MonoBehaviour
 
                 if (collider.CompareTag(kabin))
                 {
-                    score += 1000;
+                    score += 500;
                     // Œø‰Ê‰¹
                     audioSource.PlayOneShot(sound1);
                 }
