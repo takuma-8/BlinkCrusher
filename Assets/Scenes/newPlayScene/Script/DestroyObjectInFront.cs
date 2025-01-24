@@ -59,13 +59,13 @@ public class DestroyObjectInFront : MonoBehaviour
 
                 if (collider.CompareTag(kabin))
                 {
-                    score += 500;
+                    score += 100;
                     // Œø‰Ê‰¹
                     audioSource.PlayOneShot(sound1);
                 }
                 else if (collider.CompareTag(cap))
                 {
-                    score += 100;
+                    score += 1000;
                     audioSource.PlayOneShot(sound2);
                 }
 

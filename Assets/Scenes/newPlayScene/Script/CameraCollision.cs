@@ -2,58 +2,48 @@ using UnityEngine;
 
 public class CameraCollision : MonoBehaviour
 {
-    public Transform player; // プレイヤーのTransform
     public Transform cameraTransform; // カメラのTransform
-    public float cameraRadius = 0.5f; // カメラのコリジョン用の半径
-    public float smoothSpeed = 10f; // カメラ移動のスムーズさ
-    public LayerMask collisionLayer; // 壁や障害物を検出するためのレイヤー
+    public Camera mainCamera; // 通常時のカメラ
+    public Camera emperorCamera; // エンペラー状態用のカメラ
 
-    private Vector3 defaultCameraOffset; // カメラの初期オフセット
-    private Vector3 currentCameraPosition; // 現在のカメラ位置
-
-    private void Start()
-    {
-        if (player == null || cameraTransform == null)
-        {
-            Debug.LogError("プレイヤーまたはカメラのTransformが設定されていません！");
-            enabled = false;
-            return;
-        }
-
-        // 初期カメラオフセットを保存
-        defaultCameraOffset = cameraTransform.position - player.position;
-        currentCameraPosition = cameraTransform.position;
-    }
+    private bool isEmperorMode = false; // エンペラー状態かどうか
 
     private void LateUpdate()
     {
-        Vector3 desiredCameraPosition = player.position + defaultCameraOffset; // 理想的なカメラ位置
-        Vector3 direction = desiredCameraPosition - player.position; // プレイヤーからカメラへの方向
-
-        // カメラの衝突をチェック
-        if (Physics.SphereCast(player.position, cameraRadius, direction, out RaycastHit hit, direction.magnitude, collisionLayer))
+        if (isEmperorMode)
         {
-            // 衝突時、カメラを壁の手前に配置
-            currentCameraPosition = hit.point - direction.normalized * cameraRadius;
+            // エンペラー状態ではカメラ操作を停止
+            return;
+        }
+    }
+
+    public void SetEmperorMode(bool isActive, Vector3 fixedDirection)
+    {
+        isEmperorMode = isActive;
+        if (isEmperorMode)
+        {
+            if (mainCamera != null) mainCamera.gameObject.SetActive(false);
+            if (emperorCamera != null)
+            {
+                emperorCamera.gameObject.SetActive(true);
+                emperorCamera.transform.rotation = Quaternion.Euler(fixedDirection);
+                Debug.Log("エンペラー状態のカメラに切り替え、方向を固定しました。");
+            }
         }
         else
         {
-            // 衝突がない場合は、通常の位置に戻す
-            currentCameraPosition = desiredCameraPosition;
+            if (mainCamera != null) mainCamera.gameObject.SetActive(true);
+            if (emperorCamera != null) emperorCamera.gameObject.SetActive(false);
+            Debug.Log("通常状態のカメラに戻りました。");
         }
-
-        // カメラをスムーズに移動
-        cameraTransform.position = Vector3.Lerp(cameraTransform.position, currentCameraPosition, Time.deltaTime * smoothSpeed);
-        cameraTransform.LookAt(player); // カメラがプレイヤーを見るようにする
     }
 
     private void OnDrawGizmos()
     {
-        if (player != null && cameraTransform != null)
+        if (cameraTransform != null)
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawLine(player.position, cameraTransform.position);
-            Gizmos.DrawWireSphere(cameraTransform.position, cameraRadius);
+            Gizmos.DrawWireSphere(cameraTransform.position, 0.5f);
         }
     }
 }
