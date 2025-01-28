@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &5611329550036273524
+--- !u!1 &2131163568586342762
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,44 +8,44 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 5837860498889160217}
-  - component: {fileID: 3668296760382753911}
-  m_Layer: 3
-  m_Name: Spot Light
+  - component: {fileID: 8313359285056141754}
+  - component: {fileID: 5020683024223197650}
+  m_Layer: 0
+  m_Name: Point Light
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &5837860498889160217
+--- !u!4 &8313359285056141754
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5611329550036273524}
+  m_GameObject: {fileID: 2131163568586342762}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0.0033014617, y: -0.735, z: 0.011}
+  m_LocalRotation: {x: -0, y: 0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.0033014617, y: 0.54, z: -0.02}
   m_LocalScale: {x: 0.6666667, y: 0.66225165, z: 0.6666667}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 5364563506801718017}
-  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
---- !u!108 &3668296760382753911
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!108 &5020683024223197650
 Light:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5611329550036273524}
+  m_GameObject: {fileID: 2131163568586342762}
   m_Enabled: 1
   serializedVersion: 10
-  m_Type: 0
+  m_Type: 2
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 1
-  m_Range: 10
+  m_Intensity: 2
+  m_Range: 2
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
   m_CookieSize: 10
@@ -83,7 +83,7 @@ Light:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RenderingLayerMask: 1
-  m_Lightmapping: 2
+  m_Lightmapping: 4
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -280,10 +280,10 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7f22abd8b474ac045a9a98ce8df2ae99, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5837860498889160217}
+      addedObject: {fileID: 1951026321956284851}
     - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: 7f22abd8b474ac045a9a98ce8df2ae99, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1951026321956284851}
+      addedObject: {fileID: 8313359285056141754}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 7f22abd8b474ac045a9a98ce8df2ae99, type: 3}
       insertIndex: -1
