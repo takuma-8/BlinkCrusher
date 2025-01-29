@@ -16,19 +16,19 @@ public class PlayerTeleport : MonoBehaviour
     public Camera playerCamera;
     public Camera emperorCamera;
 
-    private SoundManager soundManager;
+    private PlayerSoundManager soundManager;
 
     private void Start()
     {
         playerController = GetComponent<PlayerController>();
         cameraController = GetComponent<CameraController>(); // CameraController を取得
-        soundManager = GetComponent<SoundManager>(); // SoundManagerを取得
+        soundManager = GetComponent<PlayerSoundManager>(); // SoundManagerを取得
 
         if (playerController == null)
             Debug.LogError("PlayerControllerが見つかりません！");
 
         if (soundManager == null)
-            Debug.LogError("SoundManager がアタッチされていません！");
+            Debug.LogError("PlayerSoundManager がアタッチされていません！");
     }
 
     private void EnterEmperorState(Transform targetObject)

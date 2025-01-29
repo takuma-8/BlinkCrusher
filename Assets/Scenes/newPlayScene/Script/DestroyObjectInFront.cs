@@ -8,7 +8,7 @@ public class DestroyObjectInFront : MonoBehaviour
     public string cap = "cap";
     private ObjectSpawner objectSpawner;
     public static int score = 0;
-    private SoundManager soundManager;
+    private PlayerSoundManager soundManager;
 
     private Animator hammerAnimator;
 
@@ -19,10 +19,10 @@ public class DestroyObjectInFront : MonoBehaviour
 
     void Start()
     {
-        soundManager = GetComponent<SoundManager>();
+        soundManager = GetComponent<PlayerSoundManager>();
         if (soundManager == null)
         {
-            Debug.LogError("SoundManager is not attached to the GameObject.");
+            Debug.LogError("PlayerSoundManager is not attached to the GameObject.");
         }
 
         objectSpawner = FindObjectOfType<ObjectSpawner>();

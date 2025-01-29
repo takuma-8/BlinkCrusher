@@ -14,6 +14,8 @@ public class EnemyAi : MonoBehaviour
     private bool isChasing = false;    // エネミーがプレイヤーを追跡しているかどうか
     private float timeSinceLastSeen = 0f;  // プレイヤーを見失ってから経過した時間
 
+    private EnemySoundManager soundManager;
+
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player")?.transform;  // Playerタグを持つオブジェクトを探す
@@ -23,6 +25,12 @@ public class EnemyAi : MonoBehaviour
             return;
         }
 
+        soundManager = GetComponent<EnemySoundManager>();
+
+        if (soundManager == null)
+        {
+            Debug.LogError("EnemySoundManager がアタッチされていません！");
+        }
         navAgent = GetComponent<NavMeshAgent>();  // NavMeshAgentコンポーネントを取得
         navAgent.speed = speed;  // エネミーの移動速度を設定
         animator = GetComponent<Animator>();  // Animator コンポーネントを取得
@@ -47,6 +55,11 @@ public class EnemyAi : MonoBehaviour
                 }
                 navAgent.SetDestination(player.position);
             }
+
+            if(soundManager != null)
+            {
+                soundManager.PlayChaseStart();
+            }
         }
         else
         {
@@ -54,6 +67,11 @@ public class EnemyAi : MonoBehaviour
             {
                 isChasing = false;
                 navAgent.ResetPath();  // 追跡を停止
+
+                if (soundManager != null)
+                {
+                    soundManager.StopChaseEnd();
+                }
             }
         }
 
@@ -65,6 +83,7 @@ public class EnemyAi : MonoBehaviour
             {
                 isChasing = false;
                 navAgent.ResetPath();
+                soundManager.StopChaseEnd();
             }
         }
 

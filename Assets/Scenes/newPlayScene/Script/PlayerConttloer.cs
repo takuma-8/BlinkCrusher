@@ -10,17 +10,17 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     private bool isActionLocked = false; // 操作ロックフラグ
 
-    private SoundManager soundManager;
+    private PlayerSoundManager soundManager;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        soundManager = GetComponent<SoundManager>(); // SoundManagerを取得
+        soundManager = GetComponent<PlayerSoundManager>(); // SoundManagerを取得
 
 
         if (soundManager == null)
         {
-            Debug.LogError("SoundManager がアタッチされていません！");
+            Debug.LogError("PlayerSoundManager がアタッチされていません！");
         }
     }
 
