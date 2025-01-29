@@ -56,7 +56,7 @@ public class TriggerHintUI : MonoBehaviour
         {
             if (isEmperor)
             {
-                hintText.text = "Bボタンで出る"; // エンペラー状態のメッセージ
+                hintText.text = "Bボタンで出る"; // 隠れている状態のメッセージ
                 hintText.gameObject.SetActive(true);
             }
             else if (isInRange)

@@ -7,6 +7,7 @@ public class CameraCollision : MonoBehaviour
     public Camera emperorCamera; // エンペラー状態用のカメラ
 
     private bool isEmperorMode = false; // エンペラー状態かどうか
+    private Quaternion savedRotation; // エンペラーカメラの最後の回転
 
     private void LateUpdate()
     {
@@ -32,7 +33,18 @@ public class CameraCollision : MonoBehaviour
         }
         else
         {
-            if (mainCamera != null) mainCamera.gameObject.SetActive(true);
+            if (mainCamera != null)
+            {
+                mainCamera.gameObject.SetActive(true);
+
+                // エンペラーカメラの回転をメインカメラに適用
+                if (emperorCamera != null)
+                {
+                    savedRotation = emperorCamera.transform.rotation;
+                    mainCamera.transform.rotation = savedRotation;
+                }
+            }
+
             if (emperorCamera != null) emperorCamera.gameObject.SetActive(false);
             Debug.Log("通常状態のカメラに戻りました。");
         }

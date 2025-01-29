@@ -1,76 +1,75 @@
-using System.Collections;
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.AI;
 
 public class EnemyAi : MonoBehaviour
 {
-    public float detectionRange = 5f;  // ƒvƒŒƒCƒ„[‚ğŒŸo‚·‚é”ÍˆÍ
-    public float chaseRange = 10f;     // ƒvƒŒƒCƒ„[‚ğ’ÇÕ‚·‚é”ÍˆÍ
-    public float loseSightTime = 2f;   // ƒvƒŒƒCƒ„[‚ª”ÍˆÍ‚É“ü‚ç‚È‚¯‚ê‚ÎŒ©¸‚¤‚Ü‚Å‚ÌŠÔ
-    public float speed = 5f;           // ƒGƒlƒ~[‚ÌˆÚ“®‘¬“x
+    public float detectionRange = 5f;  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’æ¤œå‡ºã™ã‚‹ç¯„å›²
+    public float chaseRange = 10f;     // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’è¿½è·¡ã™ã‚‹ç¯„å›²
+    public float loseSightTime = 2f;   // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒç¯„å›²ã«å…¥ã‚‰ãªã‘ã‚Œã°è¦‹å¤±ã†ã¾ã§ã®æ™‚é–“
+    public float speed = 5f;           // ã‚¨ãƒãƒŸãƒ¼ã®ç§»å‹•é€Ÿåº¦
 
-    private Transform player;          // ƒvƒŒƒCƒ„[‚ÌTransform
-    private NavMeshAgent navAgent;     // ƒGƒlƒ~[‚ÌNavMeshAgent
-    private bool isChasing = false;    // ƒGƒlƒ~[‚ªƒvƒŒƒCƒ„[‚ğ’ÇÕ‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©
-    private float timeSinceLastSeen = 0f;  // ƒvƒŒƒCƒ„[‚ğŒ©¸‚Á‚Ä‚©‚çŒo‰ß‚µ‚½ŠÔ
+    private Transform player;          // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®Transform
+    private NavMeshAgent navAgent;     // ã‚¨ãƒãƒŸãƒ¼ã®NavMeshAgent
+    private Animator animator;         // ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚¿ãƒ¼ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆ
+    private bool isChasing = false;    // ã‚¨ãƒãƒŸãƒ¼ãŒãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’è¿½è·¡ã—ã¦ã„ã‚‹ã‹ã©ã†ã‹
+    private float timeSinceLastSeen = 0f;  // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’è¦‹å¤±ã£ã¦ã‹ã‚‰çµŒéã—ãŸæ™‚é–“
 
     void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player")?.transform;  // Playerƒ^ƒO‚ğ‚ÂƒIƒuƒWƒFƒNƒg‚ğ’T‚·
+        player = GameObject.FindGameObjectWithTag("Player")?.transform;  // Playerã‚¿ã‚°ã‚’æŒã¤ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’æ¢ã™
         if (player == null)
         {
-            Debug.LogWarning("Playerƒ^ƒO‚ğ‚ÂƒIƒuƒWƒFƒNƒg‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñI");
-            return;  // Player‚ªŒ©‚Â‚©‚ç‚È‚¯‚ê‚Î’ÇÕ‚µ‚È‚¢
+            Debug.LogWarning("Playerã‚¿ã‚°ã‚’æŒã¤ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“ï¼");
+            return;
         }
-        navAgent = GetComponent<NavMeshAgent>();  // NavMeshAgentƒRƒ“ƒ|[ƒlƒ“ƒg‚ğæ“¾
-        navAgent.speed = speed;  // ƒGƒlƒ~[‚ÌˆÚ“®‘¬“x‚ğİ’è
+
+        navAgent = GetComponent<NavMeshAgent>();  // NavMeshAgentã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’å–å¾—
+        navAgent.speed = speed;  // ã‚¨ãƒãƒŸãƒ¼ã®ç§»å‹•é€Ÿåº¦ã‚’è¨­å®š
+        animator = GetComponent<Animator>();  // Animator ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆã‚’å–å¾—
     }
 
     void Update()
     {
-        if (player == null)
-            return;  // Player‚ª‘¶İ‚µ‚È‚¢ê‡Aˆ—‚ğ’†’f
+        if (player == null) return; // PlayerãŒå­˜åœ¨ã—ãªã„å ´åˆã€å‡¦ç†ã‚’ä¸­æ–­
+        if (!player.CompareTag("Player")) return; // "Player"ã‚¿ã‚°ãŒãªã„å ´åˆã€è¿½è·¡ã—ãªã„
 
-        // ƒvƒŒƒCƒ„[‚ª"Player"ƒ^ƒO‚ğ‚Á‚Ä‚¢‚é‚©ƒ`ƒFƒbƒN
-        if (!player.CompareTag("Player"))
-            return;  // "Player"ƒ^ƒO‚ª‚È‚¢ê‡A’ÇÕ‚µ‚È‚¢
-
-        // ƒvƒŒƒCƒ„[‚Æ‚Ì‹——£‚ğŒvZ
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-        // ƒvƒŒƒCƒ„[‚ª’ÇÕ”ÍˆÍ‚É“ü‚Á‚½ê‡
+        // è¿½è·¡ãƒ­ã‚¸ãƒƒã‚¯
         if (distanceToPlayer <= chaseRange)
         {
-            // ƒvƒŒƒCƒ„[‚ª”ÍˆÍ“à‚É‚¢‚éê‡A’ÇÕ‚ğŠJn
             if (distanceToPlayer <= detectionRange)
             {
                 if (!isChasing)
                 {
                     isChasing = true;
-                    timeSinceLastSeen = 0f;  // Œ©¸‚Á‚½ŠÔ‚ğƒŠƒZƒbƒg
+                    timeSinceLastSeen = 0f;  // è¦‹å¤±ã£ãŸæ™‚é–“ã‚’ãƒªã‚»ãƒƒãƒˆ
                 }
-                navAgent.SetDestination(player.position);  // ƒvƒŒƒCƒ„[‚ÌˆÊ’u‚ÉŒü‚©‚Á‚ÄˆÚ“®
+                navAgent.SetDestination(player.position);
             }
         }
         else
         {
-            // ’ÇÕ”ÍˆÍŠO‚Ìê‡A’Êí“®ì‚É–ß‚é
             if (isChasing)
             {
                 isChasing = false;
-                navAgent.ResetPath();  // ’ÇÕ‚ğ’â~
+                navAgent.ResetPath();  // è¿½è·¡ã‚’åœæ­¢
             }
         }
 
-        // ƒvƒŒƒCƒ„[‚ª”ÍˆÍ‚©‚ço‚Ä‚©‚ç2•bŒo‰ß‚µ‚½‚çŒ©¸‚Á‚½‚Æ‚İ‚È‚µ‚Ä’Êí“®ì‚É–ß‚é
+        // è¦‹å¤±ã„å‡¦ç†
         if (isChasing)
         {
             timeSinceLastSeen += Time.deltaTime;
             if (timeSinceLastSeen >= loseSightTime)
             {
                 isChasing = false;
-                navAgent.ResetPath();  // Œ©¸‚Á‚Ä’Êí“®ì‚É–ß‚é
+                navAgent.ResetPath();
             }
         }
+
+        // ğŸ’¡ã€ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³åˆ¶å¾¡ã€‘ã“ã“ãŒè¿½åŠ éƒ¨åˆ†ï¼
+        float moveSpeed = navAgent.velocity.magnitude; // ç¾åœ¨ã®ç§»å‹•é€Ÿåº¦
+        animator.SetFloat("Speed", moveSpeed);  // Animator ã® `Speed` ãƒ‘ãƒ©ãƒ¡ãƒ¼ã‚¿ã‚’æ›´æ–°
     }
 }

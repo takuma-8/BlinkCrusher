@@ -3,12 +3,10 @@ using UnityEngine;
 public class CameraController : MonoBehaviour
 {
     public float lookSpeedX = 2.0f;   // 横方向の視点回転速度
-    public float lookSpeedY = 2.0f;   // 縦方向の視点回転速度
 
-    private bool isCameraControlEnabled = true; // Flag to check if camera controls are enabled
-
-    private Camera playerCamera;      // プレイヤーのカメラ
-    private float rotationX = 0;      // 縦方向の回転
+    private bool isCameraControlEnabled = true; // カメラ制御の有効化フラグ
+    private Camera playerCamera;                // プレイヤーのカメラ
+    private float rotationX = 0;                // 縦方向の回転
 
     void Start()
     {
@@ -19,11 +17,10 @@ public class CameraController : MonoBehaviour
     {
         if (isCameraControlEnabled)
         {
-            HandleCameraRotation(); // Your camera control logic here
+            HandleCameraRotation(); // カメラ制御
         }
-        // カメラの回転
-        
     }
+
     public void DisableCameraControl()
     {
         isCameraControlEnabled = false;
@@ -36,12 +33,29 @@ public class CameraController : MonoBehaviour
 
     void HandleCameraRotation()
     {
-        float mouseX = Input.GetAxis("HorizontalLook") * lookSpeedX;
-        float mouseY = -Input.GetAxis("VerticalLook") * lookSpeedY;  // 縦回転を反転
+        // Time.deltaTimeを使って回転速度をフレームレートに依存させない
+        float mouseX = Input.GetAxis("HorizontalLook") * lookSpeedX * Time.deltaTime;
+        transform.Rotate(Vector3.up * mouseX); // 横回転
+    }
 
-        rotationX -= mouseY;
-        rotationX = Mathf.Clamp(rotationX, -90f, 90f); // 縦方向の回転制限
-        playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0f, 0f); // カメラの縦回転
-        transform.Rotate(Vector3.up * mouseX); // プレイヤーの横回転
+    public void SetCameraRotation(Quaternion rotation)
+    {
+        // カメラの回転を適用
+        playerCamera.transform.rotation = rotation;
+
+        // rotationX を更新
+        rotationX = playerCamera.transform.localRotation.eulerAngles.x;
+
+        // 180度超えを補正
+        if (rotationX > 180)
+        {
+            rotationX -= 360;
+        }
+    }
+
+    public void SetPlayerRotation(Quaternion rotation)
+    {
+        // プレイヤーの横方向回転を適用
+        transform.rotation = Quaternion.Euler(0, rotation.eulerAngles.y, 0);
     }
 }
