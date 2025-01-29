@@ -10,9 +10,18 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     private bool isActionLocked = false; // 操作ロックフラグ
 
+    private SoundManager soundManager;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        soundManager = GetComponent<SoundManager>(); // SoundManagerを取得
+
+
+        if (soundManager == null)
+        {
+            Debug.LogError("SoundManager がアタッチされていません！");
+        }
     }
 
     void Update()
@@ -27,10 +36,25 @@ public class PlayerController : MonoBehaviour
         Vector3 direction = transform.forward * vertical + transform.right * horizontal;
         direction = direction.normalized;
 
-        // 壁チェック
-        if (!IsWallInFront(direction))
+        bool isMoving = direction.magnitude > 0.1f; // 小さな動きを無視する閾値
+
+        if (isMoving && !IsWallInFront(direction))
         {
             rb.MovePosition(rb.position + direction * moveSpeed * Time.deltaTime);
+
+            // 足音を鳴らす
+            if (soundManager != null)
+            {
+                soundManager.PlayFootStep();
+            }
+        }
+        else
+        {
+            // 停止したら足音を止める
+            if (soundManager != null)
+            {
+                soundManager.StopFootStep();
+            }
         }
     }
 

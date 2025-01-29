@@ -17,15 +17,22 @@ public class PlayerTeleport : MonoBehaviour
     public Camera playerCamera;
     public Camera emperorCamera;
 
+    private SoundManager soundManager;
+
     private void Start()
     {
         playerController = GetComponent<PlayerController>();
         cameraController = GetComponent<CameraController>(); // CameraController を取得
+        soundManager = GetComponent<SoundManager>(); // SoundManagerを取得
+
         if (playerController == null)
             Debug.LogError("PlayerControllerが見つかりません！");
 
         if (emperorCanvas != null)
             emperorCanvas.enabled = false; // 初期状態では非表示
+
+        if (soundManager == null)
+            Debug.LogError("SoundManager がアタッチされていません！");
     }
 
     private void EnterEmperorState(Transform targetObject)
@@ -60,6 +67,9 @@ public class PlayerTeleport : MonoBehaviour
         if (emperorCanvas != null)
             emperorCanvas.enabled = true;
 
+        soundManager.StopFootStep();
+        soundManager.PlayLocker();
+
         Debug.Log("エンペラー状態に入りました。");
     }
 
@@ -84,6 +94,8 @@ public class PlayerTeleport : MonoBehaviour
         // ロッカー内演出解除
         if (emperorCanvas != null)
             emperorCanvas.enabled = false;
+
+        soundManager.PlayLocker();
 
         Debug.Log("エンペラー状態が解除されました。");
     }

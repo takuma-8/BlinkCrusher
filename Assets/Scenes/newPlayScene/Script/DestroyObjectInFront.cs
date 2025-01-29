@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
 [System.Serializable]
-
 public class DestroyObjectInFront : MonoBehaviour
 {
     public float detectionRadius = 1.0f;
@@ -9,23 +8,21 @@ public class DestroyObjectInFront : MonoBehaviour
     public string cap = "cap";
     private ObjectSpawner objectSpawner;
     public static int score = 0;
-    public AudioClip sound1;
-    public AudioClip sound2;
-    AudioSource audioSource;
+    private SoundManager soundManager;
 
     private bool isFrozen = false;
     private CharacterController characterController;
     private Rigidbody playerRigidbody;
     private int range = 8;
-   
 
     void Start()
     {
-        audioSource = GetComponent<AudioSource>();
-        if (audioSource == null)
+        soundManager = GetComponent<SoundManager>();
+        if (soundManager == null)
         {
-            Debug.LogError("AudioSource is not attached to the GameObject.");
+            Debug.LogError("SoundManager is not attached to the GameObject.");
         }
+
         objectSpawner = FindObjectOfType<ObjectSpawner>();
         characterController = GetComponent<CharacterController>();
         playerRigidbody = GetComponent<Rigidbody>();
@@ -43,8 +40,6 @@ public class DestroyObjectInFront : MonoBehaviour
 
     void DetectAndDestroy()
     {
-        PlayerController playerController = GetComponent<PlayerController>();
-
         Vector3 frontPosition = transform.position + transform.forward * detectionRadius;
         Collider[] colliders = Physics.OverlapSphere(frontPosition, detectionRadius);
 
@@ -60,19 +55,16 @@ public class DestroyObjectInFront : MonoBehaviour
                 if (collider.CompareTag(kabin))
                 {
                     score += 100;
-                    // Œø‰Ê‰¹
-                    audioSource.PlayOneShot(sound1);
+                    soundManager.PlayBreakSound("kabin");  // ‰Ô•r‚ð‰ó‚·‰¹
                 }
                 else if (collider.CompareTag(cap))
                 {
                     score += 1000;
-                    audioSource.PlayOneShot(sound2);
+                    soundManager.PlayBreakSound("cap");  // ƒLƒƒƒbƒv‚ð‰ó‚·‰¹
                 }
 
                 Destroy(collider.gameObject);
-
-                // ‰ó‚ê‚½Œã‚É”ÍˆÍ“à‚Ì“G‚ð”½‰ž‚³‚¹‚é
-                NotifyNearbyEnemies(frontPosition, range); // ”¼Œa2.5 (’¼Œa5) ‚Ì”ÍˆÍ
+                NotifyNearbyEnemies(frontPosition, range);
 
                 StartCoroutine(FreezePlayer(1.0f));
                 break;
