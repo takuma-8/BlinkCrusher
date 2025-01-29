@@ -10,6 +10,8 @@ public class DestroyObjectInFront : MonoBehaviour
     public static int score = 0;
     private SoundManager soundManager;
 
+    private Animator hammerAnimator;
+
     private bool isFrozen = false;
     private CharacterController characterController;
     private Rigidbody playerRigidbody;
@@ -24,24 +26,69 @@ public class DestroyObjectInFront : MonoBehaviour
         }
 
         objectSpawner = FindObjectOfType<ObjectSpawner>();
-        characterController = GetComponent<CharacterController>();
-        playerRigidbody = GetComponent<Rigidbody>();
+
+        // ハンマーのAnimatorを取得
+        Transform hammerTransform = transform.Find("Hammer");
+        if (hammerTransform != null)
+        {
+            hammerAnimator = hammerTransform.GetComponent<Animator>();
+        }
+
+        if (hammerAnimator == null)
+        {
+            Debug.LogError("Hammer Animator is not found. Make sure the child object has an Animator.");
+        }
     }
 
     void Update()
     {
-        if (isFrozen) return;
-
         if (Input.GetKeyDown(KeyCode.J) || Input.GetButtonDown("Fire1"))
         {
-            DetectAndDestroy();
+            if (!IsNearTargetObject()) return; // cap や kabin が近くになければ処理しない
+
+            PlayHammerAnimation(); // ハンマーアニメーション再生
+            StartCoroutine(DestroyAfterDelay(0.3f)); // 1秒後にオブジェクトを破壊
         }
     }
 
-    void DetectAndDestroy()
+    void PlayHammerAnimation()
+    {
+        if (hammerAnimator != null)
+        {
+            hammerAnimator.SetTrigger("SwingHammer");
+        }
+    }
+
+    private bool IsNearTargetObject()
     {
         Vector3 frontPosition = transform.position + transform.forward * detectionRadius;
         Collider[] colliders = Physics.OverlapSphere(frontPosition, detectionRadius);
+
+        foreach (Collider collider in colliders)
+        {
+            if (collider.CompareTag(kabin) || collider.CompareTag(cap))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private IEnumerator DestroyAfterDelay(float delay)
+    {
+        float elapsedTime = 0f; // 経過時間
+
+        while (elapsedTime < delay)  // 指定した時間が経過するまで
+        {
+            elapsedTime += Time.deltaTime;  // 経過時間を加算
+            yield return null;  // 次のフレームまで待機
+        }
+
+        // 経過時間後に破壊処理を行う
+        Vector3 frontPosition = transform.position + transform.forward * detectionRadius;
+        Collider[] colliders = Physics.OverlapSphere(frontPosition, detectionRadius);
+
+        bool destroyed = false;
 
         foreach (Collider collider in colliders)
         {
@@ -52,79 +99,34 @@ public class DestroyObjectInFront : MonoBehaviour
                     objectSpawner.RemoveSpawnedObject(collider.gameObject);
                 }
 
+                // 破壊されるオブジェクトが判定されたら処理
                 if (collider.CompareTag(kabin))
                 {
-                    score += 100;
-                    soundManager.PlayBreakSound("kabin");  // 花瓶を壊す音
+                    score += 1000;
+                    soundManager.PlayBreakSound("kabin");
                 }
                 else if (collider.CompareTag(cap))
                 {
-                    score += 1000;
-                    soundManager.PlayBreakSound("cap");  // キャップを壊す音
+                    score += 100;
+                    soundManager.PlayBreakSound("cap") ;
                 }
 
+                // オブジェクトの破壊
                 Destroy(collider.gameObject);
-                NotifyNearbyEnemies(frontPosition, range);
 
-                StartCoroutine(FreezePlayer(1.0f));
-                break;
+                // 周囲の敵に通知
+                NotifyNearbyEnemies(frontPosition, 13);
+
+                destroyed = true;
+                break; // 最初に見つかったオブジェクトだけを破壊
             }
         }
+
+        if (!destroyed)
+        {
+            Debug.LogWarning("破壊対象のオブジェクトが見つかりませんでした。");
+        }
     }
-
-    private IEnumerator FreezePlayer(float freezeDuration)
-    {
-        isFrozen = true;
-
-        // PlayerController の操作を停止
-        PlayerController playerController = GetComponent<PlayerController>();
-        if (playerController != null)
-        {
-            playerController.LockPlayerActions();
-        }
-
-        // キャラクターコントローラーを無効化
-        if (characterController != null)
-        {
-            characterController.enabled = false;
-        }
-        if (playerRigidbody != null)
-        {
-            playerRigidbody.isKinematic = true;
-            playerRigidbody.velocity = Vector3.zero;
-        }
-
-       
-
-        Debug.Log("Player is frozen, camera switched and control disabled.");
-        yield return new WaitForSeconds(freezeDuration);
-
-        // キャラクターコントローラーを再有効化
-        if (characterController != null)
-        {
-            characterController.enabled = true;
-        }
-        if (playerRigidbody != null)
-        {
-            playerRigidbody.isKinematic = false;
-        }
-
-        // PlayerController の操作を再開
-        if (playerController != null)
-        {
-            playerController.UnlockPlayerActions();
-        }
-
-        isFrozen = false;
-        Debug.Log("Player can move again, camera restored and control re-enabled.");
-    }
-
-    //void OnDrawGizmosSelected()
-    //{
-    //    Gizmos.color = Color.red;
-    //    Vector3 frontPosition = transform.position + transform.forward * detectionRadius;
-    //    Gizmos.DrawWireSphere(frontPosition, detectionRadius);
-    //}
 
     public static int GetScore()
     {
@@ -145,7 +147,6 @@ public class DestroyObjectInFront : MonoBehaviour
             EnemyController enemyController = enemyCollider.GetComponent<EnemyController>();
             if (enemyController != null)
             {
-                // 指定位置に移動し、その近辺をうろうろする
                 enemyController.MoveToPositionAndWander(position, 5f, 2f);
             }
         }
@@ -153,8 +154,8 @@ public class DestroyObjectInFront : MonoBehaviour
 
     void OnDrawGizmosSelected()
     {
-        Gizmos.color = new Color(0, 1, 0, 0.5f); // 半透明の緑
+        Gizmos.color = new Color(0, 1, 0, 0.5f);
         Vector3 frontPosition = transform.position + transform.forward * detectionRadius;
-        Gizmos.DrawWireSphere(frontPosition, range); // 反応範囲を描画
+        Gizmos.DrawWireSphere(frontPosition, 13);
     }
 }
