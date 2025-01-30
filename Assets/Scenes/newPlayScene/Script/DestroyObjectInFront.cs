@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using System.Collections;
 
 [System.Serializable]
@@ -10,64 +10,57 @@ public class DestroyObjectInFront : MonoBehaviour
     private ObjectSpawner objectSpawner;
     public static int score = 0;
     private PlayerSoundManager soundManager;
+    private PlayerController playerController;
 
     private Animator hammerAnimator;
-
-    private bool isFrozen = false;
-    private CharacterController characterController;
-    private Rigidbody playerRigidbody;
-    private int range = 8;
-
-    private bool isNearObject = false;  // ƒLƒƒƒbƒVƒ…—p
+    private bool isNearObject = false;
 
     void Start()
     {
         soundManager = GetComponent<PlayerSoundManager>();
-        if (soundManager == null)
-        {
-            Debug.LogError("PlayerSoundManager is not attached to the GameObject.");
-        }
-
         objectSpawner = FindObjectOfType<ObjectSpawner>();
+        playerController = GetComponent<PlayerController>();
 
-        // ƒnƒ“ƒ}[‚ÌAnimator‚ğæ“¾
         Transform hammerTransform = transform.Find("Hammer");
         if (hammerTransform != null)
         {
             hammerAnimator = hammerTransform.GetComponent<Animator>();
-            hammerAnimator.updateMode = AnimatorUpdateMode.AnimatePhysics; // Animator‚ÌUpdateMode‚ğ•ÏX
-        }
-
-        if (hammerAnimator == null)
-        {
-            Debug.LogError("Hammer Animator is not found. Make sure the child object has an Animator.");
+            hammerAnimator.updateMode = AnimatorUpdateMode.AnimatePhysics;
         }
     }
 
     void Update()
     {
-        // IsNearTargetObject() ‚ğƒLƒƒƒbƒVƒ…
         isNearObject = IsNearTargetObject();
 
         if (Input.GetKeyDown(KeyCode.J) || Input.GetButtonDown("Fire1"))
         {
-            if (!isNearObject) return;  // ‹ß‚­‚ÉƒIƒuƒWƒFƒNƒg‚ª‚È‚¯‚ê‚Îˆ—‚µ‚È‚¢
+            if (!isNearObject) return;
 
+            StartCoroutine(FreezePlayer());
             PlayHammerAnimation();
-            StartCoroutine(DestroyAfterDelay(0.3f));  // 1•bŒã‚ÉƒIƒuƒWƒFƒNƒg‚ğ”j‰ó
+            StartCoroutine(DestroyAfterDelay(0.3f));
         }
     }
 
-    // ƒAƒjƒ[ƒVƒ‡ƒ“‚Ì‘¦Ä¶
+    private IEnumerator FreezePlayer()
+    {
+        if (playerController != null)
+        {
+            playerController.LockPlayerActions();
+            yield return new WaitForSeconds(1f);
+            playerController.UnlockPlayerActions();
+        }
+    }
+
     void PlayHammerAnimation()
     {
         if (hammerAnimator != null && hammerAnimator.runtimeAnimatorController != null)
         {
-            hammerAnimator.Play("SwingHammer", 0, 0f);  // 0ƒtƒŒ[ƒ€–Ú‚©‚çÄ¶
+            hammerAnimator.Play("SwingHammer", 0, 0f);
         }
     }
 
-    // ƒIƒuƒWƒFƒNƒg‚ª‹ß‚­‚É‚ ‚é‚©‚Ç‚¤‚©‚ğŠm”F
     private bool IsNearTargetObject()
     {
         Vector3 frontPosition = transform.position + transform.forward * detectionRadius;
@@ -83,13 +76,10 @@ public class DestroyObjectInFront : MonoBehaviour
         return false;
     }
 
-    // ƒAƒjƒ[ƒVƒ‡ƒ“ƒCƒxƒ“ƒg‚ÅŒÄ‚Ño‚·ƒƒ\ƒbƒh
     public void DestroyObject()
     {
         Vector3 frontPosition = transform.position + transform.forward * detectionRadius;
         Collider[] colliders = Physics.OverlapSphere(frontPosition, detectionRadius);
-
-        bool destroyed = false;
 
         foreach (Collider collider in colliders)
         {
@@ -112,61 +102,26 @@ public class DestroyObjectInFront : MonoBehaviour
                 }
 
                 Destroy(collider.gameObject);
-                NotifyNearbyEnemies(frontPosition, 13);
-                destroyed = true;
                 break;
             }
         }
-
-        if (!destroyed)
-        {
-            Debug.LogWarning("”j‰ó‘ÎÛ‚ÌƒIƒuƒWƒFƒNƒg‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ‚Å‚µ‚½B");
-        }
     }
 
+    private IEnumerator DestroyAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        DestroyObject();
+    }
+
+    // ğŸ”¥ **è¿½åŠ : ã‚¹ã‚³ã‚¢ã‚’å–å¾—ã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰**
     public static int GetScore()
     {
         return score;
     }
 
+    // ğŸ”¥ **è¿½åŠ : ã‚¹ã‚³ã‚¢ã‚’ãƒªã‚»ãƒƒãƒˆã™ã‚‹ãƒ¡ã‚½ãƒƒãƒ‰**
     public static void ResetScore()
     {
         score = 0;
-    }
-
-    // ‹ß‚­‚Ì“G‚É’Ê’m
-    void NotifyNearbyEnemies(Vector3 position, float radius)
-    {
-        Collider[] enemies = Physics.OverlapSphere(position, radius);
-
-        foreach (Collider enemyCollider in enemies)
-        {
-            EnemyController enemyController = enemyCollider.GetComponent<EnemyController>();
-            if (enemyController != null)
-            {
-                enemyController.MoveToPositionAndWander(position, 5f, 2f);
-            }
-        }
-    }
-
-    void OnDrawGizmosSelected()
-    {
-        Gizmos.color = new Color(0, 1, 0, 0.5f);
-        Vector3 frontPosition = transform.position + transform.forward * detectionRadius;
-        Gizmos.DrawWireSphere(frontPosition, 13);
-    }
-
-    // •¨—‰‰Z‚Æ“¯Šú‚µ‚½XV
-    private void FixedUpdate()
-    {
-        isNearObject = IsNearTargetObject(); // FixedUpdate‚Å•¨—‰‰Z‚Æ“¯Šú
-    }
-
-    // ”j‰ó‚ğ’x‰„‚³‚¹‚éƒRƒ‹[ƒ`ƒ“
-    private IEnumerator DestroyAfterDelay(float delay)
-    {
-        yield return new WaitForSeconds(delay);  // w’è‚µ‚½’x‰„‚ğ‘Ò‚Â
-
-        DestroyObject();  // ’x‰„Œã‚ÉƒIƒuƒWƒFƒNƒg‚ğ”j‰ó
     }
 }

@@ -21,6 +21,6 @@ public class life : MonoBehaviour
     private void TriggerGameOver()
     {
         Debug.Log("ゲームオーバー");
-        SceneManager.LoadScene("ResultScene"); // ゲームオーバーシーンへ遷移
+        FadeManager.Instance.LoadScene("ResultScene", 1.0f);
     }
 }

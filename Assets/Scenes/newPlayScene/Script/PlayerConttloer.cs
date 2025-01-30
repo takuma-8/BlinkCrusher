@@ -3,20 +3,19 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement Parameters")]
-    public float moveSpeed = 5.0f; // 通常の移動速度
-    public float maxDistanceToWall = 0.5f; // 壁との距離の閾値
+    public float moveSpeed = 5.0f;
+    public float maxDistanceToWall = 0.5f;
     public string wallTag = "Wall";
 
     private Rigidbody rb;
-    private bool isActionLocked = false; // 操作ロックフラグ
+    private bool isActionLocked = false;
 
     private PlayerSoundManager soundManager;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        soundManager = GetComponent<PlayerSoundManager>(); // SoundManagerを取得
-
+        soundManager = GetComponent<PlayerSoundManager>();
 
         if (soundManager == null)
         {
@@ -24,72 +23,58 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        if (isActionLocked) return; // 操作ロック中は何もしない
+        if (isActionLocked) return;
 
-        // Xboxコントローラーの右スティックで移動
-        float horizontal = Input.GetAxis("Horizontal"); // 右スティックの左右
-        float vertical = Input.GetAxis("Vertical"); // 右スティックの上下
+        // Xbox コントローラーの右スティックで移動
+        float horizontal = Input.GetAxis("Horizontal");
+        float vertical = Input.GetAxis("Vertical");
 
-        // プレイヤーの移動
         Vector3 direction = transform.forward * vertical + transform.right * horizontal;
-        direction = direction.normalized;
 
-        bool isMoving = direction.magnitude > 0.1f; // 小さな動きを無視する閾値
-
-        if (isMoving && !IsWallInFront(direction))
+        if (direction.sqrMagnitude > 0.01f) // 小さな動きを無視
         {
-            rb.MovePosition(rb.position + direction * moveSpeed * Time.deltaTime);
+            direction.Normalize();
 
-            // 足音を鳴らす
-            if (soundManager != null)
+            if (!IsWallInFront(direction))
             {
-                soundManager.PlayFootStep();
+                rb.MovePosition(rb.position + direction * moveSpeed * Time.fixedDeltaTime);
+
+                if (soundManager != null)
+                {
+                    soundManager.PlayFootStep();
+                }
             }
-        }
-        else
-        {
-            // 停止したら足音を止める
-            if (soundManager != null)
+            else if (soundManager != null)
             {
                 soundManager.StopFootStep();
             }
         }
+        else if (soundManager != null)
+        {
+            soundManager.StopFootStep();
+        }
     }
 
-    /// <summary>
-    /// 壁が目の前にあるかどうかをチェック
-    /// </summary>
-    /// <param name="direction">進行方向</param>
-    /// <returns>壁がある場合はtrue</returns>
     bool IsWallInFront(Vector3 direction)
     {
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, direction, out hit, maxDistanceToWall))
-        {
-            if (hit.collider.CompareTag(wallTag))
-            {
-                Debug.Log("Wall detected!");
-                return true;
-            }
-        }
-        return false;
+        return Physics.Raycast(transform.position, direction, out hit, maxDistanceToWall) && hit.collider.CompareTag(wallTag);
     }
 
     public void LockPlayerActions()
     {
         isActionLocked = true;
-        rb.isKinematic = true; // 動きを完全に停止
+        rb.isKinematic = true;
     }
 
     public void UnlockPlayerActions()
     {
         isActionLocked = false;
-        rb.isKinematic = false; // 動作を再開
+        rb.isKinematic = false;
     }
 
-    // プレイヤーのタグを変更
     public void ChangePlayerTag(string newTag)
     {
         gameObject.tag = newTag;

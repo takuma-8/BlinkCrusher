@@ -36,7 +36,7 @@ public class ObjectSpawner : MonoBehaviour
         spawnedObjects.Add(specialObject);
 
         // 通常のアイテムをランダムに配置
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 7; i++)
         {
             Vector3 spawnPosition = GetRandomPosition();
             GameObject newObject = Instantiate(cap, spawnPosition, Quaternion.identity);
