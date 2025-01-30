@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+
 [System.Serializable]
 public class DestroyObjectInFront : MonoBehaviour
 {
@@ -17,6 +18,8 @@ public class DestroyObjectInFront : MonoBehaviour
     private Rigidbody playerRigidbody;
     private int range = 8;
 
+    private bool isNearObject = false;  // キャッシュ用
+
     void Start()
     {
         soundManager = GetComponent<PlayerSoundManager>();
@@ -32,6 +35,7 @@ public class DestroyObjectInFront : MonoBehaviour
         if (hammerTransform != null)
         {
             hammerAnimator = hammerTransform.GetComponent<Animator>();
+            hammerAnimator.updateMode = AnimatorUpdateMode.AnimatePhysics; // AnimatorのUpdateModeを変更
         }
 
         if (hammerAnimator == null)
@@ -42,23 +46,28 @@ public class DestroyObjectInFront : MonoBehaviour
 
     void Update()
     {
+        // IsNearTargetObject() をキャッシュ
+        isNearObject = IsNearTargetObject();
+
         if (Input.GetKeyDown(KeyCode.J) || Input.GetButtonDown("Fire1"))
         {
-            if (!IsNearTargetObject()) return; // cap や kabin が近くになければ処理しない
+            if (!isNearObject) return;  // 近くにオブジェクトがなければ処理しない
 
-            PlayHammerAnimation(); // ハンマーアニメーション再生
-            StartCoroutine(DestroyAfterDelay(0.3f)); // 1秒後にオブジェクトを破壊
+            PlayHammerAnimation();
+            StartCoroutine(DestroyAfterDelay(0.3f));  // 1秒後にオブジェクトを破壊
         }
     }
 
+    // アニメーションの即時再生
     void PlayHammerAnimation()
     {
-        if (hammerAnimator != null)
+        if (hammerAnimator != null && hammerAnimator.runtimeAnimatorController != null)
         {
-            hammerAnimator.SetTrigger("SwingHammer");
+            hammerAnimator.Play("SwingHammer", 0, 0f);  // 0フレーム目から再生
         }
     }
 
+    // オブジェクトが近くにあるかどうかを確認
     private bool IsNearTargetObject()
     {
         Vector3 frontPosition = transform.position + transform.forward * detectionRadius;
@@ -74,17 +83,9 @@ public class DestroyObjectInFront : MonoBehaviour
         return false;
     }
 
-    private IEnumerator DestroyAfterDelay(float delay)
+    // アニメーションイベントで呼び出すメソッド
+    public void DestroyObject()
     {
-        float elapsedTime = 0f; // 経過時間
-
-        while (elapsedTime < delay)  // 指定した時間が経過するまで
-        {
-            elapsedTime += Time.deltaTime;  // 経過時間を加算
-            yield return null;  // 次のフレームまで待機
-        }
-
-        // 経過時間後に破壊処理を行う
         Vector3 frontPosition = transform.position + transform.forward * detectionRadius;
         Collider[] colliders = Physics.OverlapSphere(frontPosition, detectionRadius);
 
@@ -99,7 +100,6 @@ public class DestroyObjectInFront : MonoBehaviour
                     objectSpawner.RemoveSpawnedObject(collider.gameObject);
                 }
 
-                // 破壊されるオブジェクトが判定されたら処理
                 if (collider.CompareTag(kabin))
                 {
                     score += 1000;
@@ -108,17 +108,13 @@ public class DestroyObjectInFront : MonoBehaviour
                 else if (collider.CompareTag(cap))
                 {
                     score += 100;
-                    soundManager.PlayBreakSound("cap") ;
+                    soundManager.PlayBreakSound("cap");
                 }
 
-                // オブジェクトの破壊
                 Destroy(collider.gameObject);
-
-                // 周囲の敵に通知
                 NotifyNearbyEnemies(frontPosition, 13);
-
                 destroyed = true;
-                break; // 最初に見つかったオブジェクトだけを破壊
+                break;
             }
         }
 
@@ -138,6 +134,7 @@ public class DestroyObjectInFront : MonoBehaviour
         score = 0;
     }
 
+    // 近くの敵に通知
     void NotifyNearbyEnemies(Vector3 position, float radius)
     {
         Collider[] enemies = Physics.OverlapSphere(position, radius);
@@ -157,5 +154,19 @@ public class DestroyObjectInFront : MonoBehaviour
         Gizmos.color = new Color(0, 1, 0, 0.5f);
         Vector3 frontPosition = transform.position + transform.forward * detectionRadius;
         Gizmos.DrawWireSphere(frontPosition, 13);
+    }
+
+    // 物理演算と同期した更新
+    private void FixedUpdate()
+    {
+        isNearObject = IsNearTargetObject(); // FixedUpdateで物理演算と同期
+    }
+
+    // 破壊を遅延させるコルーチン
+    private IEnumerator DestroyAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);  // 指定した遅延を待つ
+
+        DestroyObject();  // 遅延後にオブジェクトを破壊
     }
 }
