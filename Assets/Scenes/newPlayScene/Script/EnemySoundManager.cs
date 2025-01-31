@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EnemySoundManager : MonoBehaviour
 {
-    private AudioSource chaseSource;
+    public AudioSource chaseSource;
     private Transform player;  // Reference to the player's transform
 
     [Header("Audio Clips")]
@@ -23,7 +23,7 @@ public class EnemySoundManager : MonoBehaviour
 
         // Create AudioSource for chase sound
         chaseSource = gameObject.AddComponent<AudioSource>();
-        chaseSource.loop = false;
+        chaseSource.loop = true;
     }
 
     void Update()
@@ -36,15 +36,20 @@ public class EnemySoundManager : MonoBehaviour
 
     public void PlayChaseStart()
     {
-        if (chaseSource != null)
+        if (chaseSource != null && chaseSound != null)
         {
-            chaseSource.PlayOneShot(chaseSound);
+            if (!chaseSource.isPlaying) // Ç∑Ç≈Ç…çƒê∂íÜÇ»ÇÁâΩÇ‡ÇµÇ»Ç¢
+            {
+                chaseSource.clip = chaseSound;
+                chaseSource.loop = true;
+                chaseSource.Play();
+            }
         }
     }
 
     public void StopChaseEnd()
     {
-        if (chaseSource != null)
+        if (chaseSource != null && chaseSource.isPlaying) // çƒê∂íÜÇÃÇ∆Ç´ÇÃÇ›í‚é~
         {
             chaseSource.Stop();
         }
