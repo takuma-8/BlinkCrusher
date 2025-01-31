@@ -49,9 +49,10 @@ public class EnemySoundManager : MonoBehaviour
 
     public void StopChaseEnd()
     {
-        if (chaseSource != null && chaseSource.isPlaying) // 再生中のときのみ停止
+        if (chaseSource != null && chaseSource.isPlaying)
         {
-            chaseSource.Stop();
+            Debug.Log("音をフェードアウト"); // 確認用
+            StartCoroutine(FadeOutAndStop()); // 音をフェードアウト
         }
     }
 
@@ -70,5 +71,21 @@ public class EnemySoundManager : MonoBehaviour
             float pitch = Mathf.Lerp(maxPitch, minPitch, (distance - minDistance) / (maxDistance - minDistance));
             chaseSource.pitch = pitch;
         }
+    }
+
+    private IEnumerator FadeOutAndStop()
+    {
+        float fadeTime = 1.0f; // 1秒かけてフェードアウト
+        float startVolume = chaseSource.volume;
+
+        while (chaseSource.volume > 0)
+        {
+            chaseSource.volume -= startVolume * Time.deltaTime / fadeTime;
+            yield return null;
+        }
+
+        chaseSource.Stop();
+        chaseSource.volume = startVolume; // 次回再生時のために音量を元に戻す
+        Debug.Log("音が完全に停止"); // 確認用
     }
 }

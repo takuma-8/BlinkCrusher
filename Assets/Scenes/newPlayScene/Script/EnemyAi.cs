@@ -16,6 +16,8 @@ public class EnemyAi : MonoBehaviour
 
     private EnemySoundManager soundManager;
     private bool isSoundPlaying = false; // 追跡中の音が再生されているかを判定する
+    private float chaseCooldown = 1.0f; // 追跡音のクールダウン時間
+    private float lastChaseEndTime = -100f; // 最後に StopChaseEnd() を呼んだ時間
 
     void Start()
     {
@@ -53,11 +55,14 @@ public class EnemyAi : MonoBehaviour
                 {
                     isChasing = true;
                     timeSinceLastSeen = 0f;  // 見失った時間をリセット
+                }
 
-                    if (!soundManager.chaseSource.isPlaying) // isSoundPlaying ではなく AudioSource を直接チェック
-                    {
-                        soundManager.PlayChaseStart();
-                    }
+                // すでに追跡モードになっていて、かつ音が鳴っていないときだけ再生
+                if (isChasing && !isSoundPlaying && (Time.time - lastChaseEndTime > chaseCooldown))
+                {
+                    soundManager.PlayChaseStart();
+                    isSoundPlaying = true;
+                    Debug.Log("PlayChaseStart() を実行！");
                 }
                 navAgent.SetDestination(player.position);
             }
@@ -73,7 +78,9 @@ public class EnemyAi : MonoBehaviour
                 if (isSoundPlaying && soundManager != null)
                 {
                     soundManager.StopChaseEnd();
-                    isSoundPlaying = false; // フラグをリセット
+                    isSoundPlaying = false;
+                    lastChaseEndTime = Time.time; // 追跡音の終了時刻を記録
+                    Debug.Log("StopChaseEnd() を実行！");
                 }
             }
         }
@@ -92,6 +99,8 @@ public class EnemyAi : MonoBehaviour
                 {
                     soundManager.StopChaseEnd();
                     isSoundPlaying = false;
+                    lastChaseEndTime = Time.time; // 追跡音の終了時刻を記録
+                    Debug.Log("StopChaseEnd() を実行！");
                 }
             }
         }
