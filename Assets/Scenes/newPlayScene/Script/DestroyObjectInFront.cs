@@ -14,6 +14,7 @@ public class DestroyObjectInFront : MonoBehaviour
 
     private Animator hammerAnimator;
     private bool isNearObject = false;
+    private bool isAttacking = false; // 🔥 追加：攻撃中のフラグ
 
     void Start()
     {
@@ -31,15 +32,19 @@ public class DestroyObjectInFront : MonoBehaviour
 
     void Update()
     {
+        if (isAttacking) return; // 🔥 追加：攻撃中は入力を受け付けない
+
         isNearObject = IsNearTargetObject();
 
         if (Input.GetKeyDown(KeyCode.J) || Input.GetButtonDown("Fire1"))
         {
-            if (!isNearObject) return;
+            StartCoroutine(PlayHammerAnimation());  // 🔥 修正：アニメーションをコルーチンで管理
 
-            StartCoroutine(FreezePlayer());
-            PlayHammerAnimation();
-            StartCoroutine(DestroyAfterDelay(0.3f));
+            if (isNearObject)
+            {
+                StartCoroutine(FreezePlayer());
+                StartCoroutine(DestroyAfterDelay(0.3f));
+            }
         }
     }
 
@@ -53,11 +58,16 @@ public class DestroyObjectInFront : MonoBehaviour
         }
     }
 
-    void PlayHammerAnimation()
+    private IEnumerator PlayHammerAnimation()
     {
         if (hammerAnimator != null && hammerAnimator.runtimeAnimatorController != null)
         {
+            isAttacking = true; // 🔥 攻撃中フラグを設定
             hammerAnimator.Play("SwingHammer", 0, 0f);
+
+            yield return new WaitForSeconds(hammerAnimator.GetCurrentAnimatorStateInfo(0).length); // 🔥 アニメーションの長さ待機
+
+            isAttacking = false; // 🔥 攻撃終了
         }
     }
 
@@ -113,13 +123,13 @@ public class DestroyObjectInFront : MonoBehaviour
         DestroyObject();
     }
 
-    // 🔥 **追加: スコアを取得するメソッド**
+    // 🔥 スコアを取得するメソッド
     public static int GetScore()
     {
         return score;
     }
 
-    // 🔥 **追加: スコアをリセットするメソッド**
+    // 🔥 スコアをリセットするメソッド
     public static void ResetScore()
     {
         score = 0;
