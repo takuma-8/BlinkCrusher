@@ -32,10 +32,16 @@ public class Life : MonoBehaviour
         // ゲームオーバーの画像を表示
         gameOverImage.gameObject.SetActive(true);
 
-        // 画像を表示して一定時間待機
-        yield return new WaitForSeconds(displayTime);
+        // プレイヤーのタグを変更
+        gameObject.tag = "not_Player";
 
-        // シーン遷移
+        // ゲームをフリーズ
+        Time.timeScale = 0;
+
+        // 画像を表示して一定時間待機（リアルタイム時間を基準に）
+        yield return new WaitForSecondsRealtime(displayTime);
+        Time.timeScale = 1;
+        // シーン遷移（フリーズを維持したまま）
         FadeManager.Instance.LoadScene("ResultScene", 1.0f);
     }
 }

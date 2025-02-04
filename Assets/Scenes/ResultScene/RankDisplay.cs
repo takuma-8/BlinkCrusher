@@ -7,6 +7,7 @@ public class RankDisplay : MonoBehaviour
 
     private void Start()
     {
+        
         // PlayerPrefs からスコアを取得してランクを表示
         int score = DestroyObjectInFront.GetScore();
         Debug.Log("スコア: " + score); // スコアが正しく取得されているか確認
