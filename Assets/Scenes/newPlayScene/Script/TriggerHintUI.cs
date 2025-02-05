@@ -3,9 +3,11 @@ using UnityEngine.UI;
 
 public class TriggerHintUI : MonoBehaviour
 {
-    public Text hintText; // ヒントメッセージ用のUIテキスト
-    private PlayerTeleport playerTeleport; // 親オブジェクトにあるPlayerTeleportへの参照
+    public Image hintImage; // ヒント用のUI画像
+    public Sprite showHintSprite; // 「Bボタンで出る」の画像
+    public Sprite hideHintSprite; // 「Bボタンで隠れる」の画像
 
+    private PlayerTeleport playerTeleport; // 親オブジェクトにあるPlayerTeleportへの参照
     private bool previousStateIsEmperor;
     private bool previousStateInRange;
 
@@ -14,9 +16,9 @@ public class TriggerHintUI : MonoBehaviour
         // 親オブジェクトからPlayerTeleportを取得
         playerTeleport = GetComponentInParent<PlayerTeleport>();
 
-        if (hintText == null)
+        if (hintImage == null)
         {
-            Debug.LogError("HintTextが設定されていません！InspectorでUIテキストを設定してください。");
+            Debug.LogError("HintImageが設定されていません！InspectorでUI Imageを設定してください。");
             enabled = false;
             return;
         }
@@ -28,7 +30,7 @@ public class TriggerHintUI : MonoBehaviour
             return;
         }
 
-        hintText.gameObject.SetActive(false); // 初期状態では非表示
+        hintImage.enabled = false; // 初期状態では非表示
     }
 
     private void Update()
@@ -56,17 +58,17 @@ public class TriggerHintUI : MonoBehaviour
         {
             if (isEmperor)
             {
-                hintText.text = "Bボタンで出る"; // 隠れている状態のメッセージ
-                hintText.gameObject.SetActive(true);
+                hintImage.sprite = showHintSprite; // 「Bボタンで出る」の画像に変更
+                hintImage.enabled = true; // 画像を表示
             }
             else if (isInRange)
             {
-                hintText.text = "Bボタンで隠れる"; // 通常時のメッセージ
-                hintText.gameObject.SetActive(true);
+                hintImage.sprite = hideHintSprite; // 「Bボタンで隠れる」の画像に変更
+                hintImage.enabled = true; // 画像を表示
             }
             else
             {
-                hintText.gameObject.SetActive(false); // 非表示
+                hintImage.enabled = false; // 画像を非表示
             }
 
             previousStateIsEmperor = isEmperor;
