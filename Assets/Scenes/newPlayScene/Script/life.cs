@@ -27,6 +27,9 @@ public class Life : MonoBehaviour
 
     private IEnumerator TriggerGameOver()
     {
+        // 全ての効果音を消す
+        AudioListener.pause = true;
+
         Debug.Log("ゲームオーバー");
 
         // ゲームオーバーの画像を表示

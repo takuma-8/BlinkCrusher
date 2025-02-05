@@ -45,6 +45,7 @@ public class PlayerTeleport : MonoBehaviour
         {
             playerCamera.transform.rotation = Quaternion.Euler(0, 0, 0);
             playerCamera.gameObject.SetActive(false);
+            SwitchAudioListener(playerCamera, emperorCamera);
         }
 
         // エンペラーカメラをリセット
@@ -112,6 +113,7 @@ public class PlayerTeleport : MonoBehaviour
         if (emperorCamera != null)
         {
             emperorCamera.gameObject.SetActive(false);
+            SwitchAudioListener(emperorCamera, playerCamera);
         }
 
         // カメラコントロールを復元
@@ -177,6 +179,21 @@ public class PlayerTeleport : MonoBehaviour
         if (locker != null)
         {
             locker.enabled = isEmperor;
+        }
+    }
+
+    private void SwitchAudioListener(Camera fromCamera, Camera toCamera)
+    {
+        if (fromCamera != null)
+        {
+            AudioListener fromListener = fromCamera.GetComponent<AudioListener>();
+            if (fromListener != null) fromListener.enabled = false;
+        }
+
+        if (toCamera != null)
+        {
+            AudioListener toListener = toCamera.GetComponent<AudioListener>();
+            if (toListener != null) toListener.enabled = true;
         }
     }
 }

@@ -9,6 +9,7 @@ public class ControllerButtonClick : MonoBehaviour
 
     void Update()
     {
+        AudioListener.pause = false;
         // Bボタン（JoystickButton1）が押されたらボタンをクリック
         if (Input.GetKeyDown(KeyCode.JoystickButton0))
         {

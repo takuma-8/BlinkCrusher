@@ -27,7 +27,7 @@ public class EnemySoundManager : MonoBehaviour
     private bool isChasing = false;
 
     [Header("Sound Distance Settings")]
-    public float maxHearDistance = 100f; // ‘«‰¹‚ª•·‚±‚¦‚éÅ‘å‹——£
+    public float maxHearDistance = 1000f; // ‘«‰¹‚ª•·‚±‚¦‚éÅ‘å‹——£
     public float minHearDistance = 1f;  // Å‘å‰¹—Ê‚É‚È‚é‹——£
 
 

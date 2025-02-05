@@ -19,6 +19,8 @@ public class EnemyAi : MonoBehaviour
     private float chaseCooldown = 1.0f; // 追跡音のクールダウン時間
     private float lastChaseEndTime = -100f; // 最後に StopChaseEnd() を呼んだ時間
 
+    private static bool isAnyEnemyChasing = false;
+
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player")?.transform;  // Playerタグを持つオブジェクトを探す
@@ -54,16 +56,16 @@ public class EnemyAi : MonoBehaviour
                 if (!isChasing)
                 {
                     isChasing = true;
-                    timeSinceLastSeen = 0f;  // 見失った時間をリセット
+                    timeSinceLastSeen = 0f;
                     soundManager.SetChaseMode(true);
-                }
 
-                // すでに追跡モードになっていて、かつ音が鳴っていないときだけ再生
-                if (isChasing && !isSoundPlaying && (Time.time - lastChaseEndTime > chaseCooldown))
-                {
-                    soundManager.PlayChaseStart();
-                    isSoundPlaying = true;
-                    Debug.Log("PlayChaseStart() を実行！");
+                    // 誰も追跡していないなら音を鳴らす
+                    if (!isAnyEnemyChasing)
+                    {
+                        soundManager.PlayChaseStart();
+                        isAnyEnemyChasing = true;
+                        Debug.Log("PlayChaseStart() を実行！");
+                    }
                 }
                 navAgent.SetDestination(player.position);
             }
@@ -76,8 +78,27 @@ public class EnemyAi : MonoBehaviour
                 navAgent.ResetPath();  // 追跡を停止
                 soundManager.SetChaseMode(false);
 
-                // 追跡終了時に音を止める
-                if (isSoundPlaying && soundManager != null)
+                // 全エネミーが追跡をやめたら音を止める
+                if (isAnyEnemyChasing)
+                {
+                    bool anyStillChasing = false;
+                    foreach (EnemyAi enemy in FindObjectsOfType<EnemyAi>())
+                    {
+                        if (enemy.isChasing)
+                        {
+                            anyStillChasing = true;
+                            break;
+                        }
+                    }
+
+                    if (!anyStillChasing)
+                    {
+                        soundManager.StopChaseEnd();
+                        isAnyEnemyChasing = false;
+                        Debug.Log("StopChaseEnd() を実行！");
+                    }
+                }
+                if (isSoundPlaying && soundManager != null && isAnyEnemyChasing)
                 {
                     soundManager.StopChaseEnd();
                     isSoundPlaying = false;
@@ -97,13 +118,25 @@ public class EnemyAi : MonoBehaviour
                 navAgent.ResetPath();
                 soundManager.SetChaseMode(false);
 
-                // 追跡終了時に音を止める（見失った場合）
-                if (isSoundPlaying && soundManager != null)
+                // 全エネミーが追跡をやめたら音を止める
+                if (isAnyEnemyChasing)
                 {
-                    soundManager.StopChaseEnd();
-                    isSoundPlaying = false;
-                    lastChaseEndTime = Time.time; // 追跡音の終了時刻を記録
-                    Debug.Log("StopChaseEnd() を実行！");
+                    bool anyStillChasing = false;
+                    foreach (EnemyAi enemy in FindObjectsOfType<EnemyAi>())
+                    {
+                        if (enemy.isChasing)
+                        {
+                            anyStillChasing = true;
+                            break;
+                        }
+                    }
+
+                    if (!anyStillChasing)
+                    {
+                        soundManager.StopChaseEnd();
+                        isAnyEnemyChasing = false;
+                        Debug.Log("StopChaseEnd() を実行！");
+                    }
                 }
             }
         }
