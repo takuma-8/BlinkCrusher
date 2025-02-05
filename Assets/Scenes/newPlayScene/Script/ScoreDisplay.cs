@@ -29,6 +29,6 @@ public class ScoreDisplay : MonoBehaviour
     void UpdateScoreDisplay()
     {
         // スコアを画面に表示
-        scoreText.text = "Score: " + score.ToString();
+        scoreText.text = score.ToString();
     }
 }

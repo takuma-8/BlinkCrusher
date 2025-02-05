@@ -4,15 +4,17 @@ using UnityEngine;
 
 public class ObjectSpawner : MonoBehaviour
 {
-    public GameObject cap; // 通常のアイテムプレハブ (cap)
-    public GameObject kabin; // 高得点アイテムプレハブ (kabin)
-    public GameObject[] randomObjects; // ランダムなオブジェクトリスト
-    private List<GameObject> spawnedObjects = new List<GameObject>(); // 生成されたオブジェクトを追跡
+    public GameObject cap;
+    public GameObject kabin;
+    public GameObject[] randomObjects;
+    private List<GameObject> spawnedObjects = new List<GameObject>();
+    private List<Vector3> recentlyDestroyedPositions = new List<Vector3>();
 
-    public GameObject cap2; // 通常アイテム破壊アニメーション (cap2)
-    public GameObject kabin2; // 高得点アイテム破壊アニメーション (kabin2)
+    public GameObject cap2;
+    public GameObject kabin2;
 
-    private const float minimumDistance = 1.0f; // 重複防止の最小距離
+    private const float minimumDistance = 1.0f;
+    private const float spawnBlockDuration = 10f;
 
     void Start()
     {
@@ -29,47 +31,46 @@ public class ObjectSpawner : MonoBehaviour
 
     void SpawnObjects()
     {
-        // 高得点アイテムを固定位置に配置
         Vector3 specialObjectPosition = new Vector3(0f, 1.5f, 0f);
         GameObject specialObject = Instantiate(kabin, specialObjectPosition, Quaternion.identity);
         specialObject.tag = "kabin";
         spawnedObjects.Add(specialObject);
 
-        // 通常のアイテムをランダムに配置
         for (int i = 0; i < 7; i++)
         {
-            Vector3 spawnPosition = GetRandomPosition();
+            Vector3 spawnPosition = GetValidRandomPosition();
             GameObject newObject = Instantiate(cap, spawnPosition, Quaternion.identity);
             newObject.tag = "cap";
             spawnedObjects.Add(newObject);
         }
     }
 
-    Vector3 GetRandomPosition()
+    Vector3 GetValidRandomPosition()
     {
         Vector3 spawnPosition;
-        int maxAttempts = 10; // 位置を再試行する最大回数
+        int maxAttempts = 20;
         int attempts = 0;
 
         do
         {
-            // ランダムな位置を生成
-            if (randomObjects.Length > 0)
-            {
-                GameObject randomObj = randomObjects[Random.Range(0, randomObjects.Length)];
-                spawnPosition = new Vector3(randomObj.transform.position.x, 1.5f, randomObj.transform.position.z);
-            }
-            else
-            {
-                spawnPosition = new Vector3(Random.Range(-5f, 5f), 1.5f, Random.Range(-5f, 5f)); // フォールバックとしてランダム位置
-            }
-
+            spawnPosition = GetRandomPosition();
             attempts++;
-
-            // 最小距離を満たしていればループを抜ける
-        } while (IsPositionOccupied(spawnPosition) && attempts < maxAttempts);
+        } while ((IsPositionOccupied(spawnPosition) || IsPositionRecentlyDestroyed(spawnPosition)) && attempts < maxAttempts);
 
         return spawnPosition;
+    }
+
+    Vector3 GetRandomPosition()
+    {
+        if (randomObjects.Length > 0)
+        {
+            GameObject randomObj = randomObjects[Random.Range(0, randomObjects.Length)];
+            return new Vector3(randomObj.transform.position.x, 1.5f, randomObj.transform.position.z);
+        }
+        else
+        {
+            return new Vector3(Random.Range(-5f, 5f), 1.5f, Random.Range(-5f, 5f));
+        }
     }
 
     bool IsPositionOccupied(Vector3 position)
@@ -78,10 +79,22 @@ public class ObjectSpawner : MonoBehaviour
         {
             if (Vector3.Distance(obj.transform.position, position) < minimumDistance)
             {
-                return true; // 他のオブジェクトと近すぎる
+                return true;
             }
         }
-        return false; // 十分離れている
+        return false;
+    }
+
+    bool IsPositionRecentlyDestroyed(Vector3 position)
+    {
+        foreach (var pos in recentlyDestroyedPositions)
+        {
+            if (Vector3.Distance(pos, position) < minimumDistance)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void RemoveSpawnedObject(GameObject obj)
@@ -89,7 +102,8 @@ public class ObjectSpawner : MonoBehaviour
         if (spawnedObjects.Contains(obj))
         {
             spawnedObjects.Remove(obj);
-            Debug.Log($"Destroyed Object Name: {obj.name}, Tag: {obj.tag}");
+            recentlyDestroyedPositions.Add(obj.transform.position);
+            StartCoroutine(RemoveDestroyedPositionAfterDelay(obj.transform.position, spawnBlockDuration));
 
             if (obj.CompareTag("kabin"))
             {
@@ -99,7 +113,7 @@ public class ObjectSpawner : MonoBehaviour
             else if (obj.CompareTag("cap"))
             {
                 StartCoroutine(SpawnAnimationAndDestroy(obj, cap2));
-                StartCoroutine(RespawnObjectAfterDelay(GetRandomPosition(), "cap", 15f)); // ランダム位置で再生成
+                StartCoroutine(RespawnObjectAfterDelay(GetValidRandomPosition(), "cap", 15f));
             }
             Destroy(obj);
         }
@@ -114,13 +128,16 @@ public class ObjectSpawner : MonoBehaviour
 
     private IEnumerator RespawnObjectAfterDelay(Vector3 position, string type, float delay)
     {
-        Debug.Log($"Respawning {type} at {position} after {delay} seconds...");
         yield return new WaitForSeconds(delay);
-
         GameObject prefabToSpawn = (type == "kabin") ? kabin : cap;
         GameObject newObject = Instantiate(prefabToSpawn, position, Quaternion.identity);
         newObject.tag = type;
         spawnedObjects.Add(newObject);
-        Debug.Log($"{type} respawned at {position}!");
+    }
+
+    private IEnumerator RemoveDestroyedPositionAfterDelay(Vector3 position, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        recentlyDestroyedPositions.Remove(position);
     }
 }
