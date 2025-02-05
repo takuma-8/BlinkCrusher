@@ -55,6 +55,7 @@ public class EnemyAi : MonoBehaviour
                 {
                     isChasing = true;
                     timeSinceLastSeen = 0f;  // 見失った時間をリセット
+                    soundManager.SetChaseMode(true);
                 }
 
                 // すでに追跡モードになっていて、かつ音が鳴っていないときだけ再生
@@ -73,6 +74,7 @@ public class EnemyAi : MonoBehaviour
             {
                 isChasing = false;
                 navAgent.ResetPath();  // 追跡を停止
+                soundManager.SetChaseMode(false);
 
                 // 追跡終了時に音を止める
                 if (isSoundPlaying && soundManager != null)
@@ -93,6 +95,7 @@ public class EnemyAi : MonoBehaviour
             {
                 isChasing = false;
                 navAgent.ResetPath();
+                soundManager.SetChaseMode(false);
 
                 // 追跡終了時に音を止める（見失った場合）
                 if (isSoundPlaying && soundManager != null)

@@ -3692,6 +3692,18 @@ PrefabInstance:
       propertyPath: m_Speed
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 3008066840293270908, guid: f4287571c4365ef46959a7aeb3a06cb9, type: 3}
+      propertyPath: runSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 10be9821707dc9e4691eba8669e643ee, type: 3}
+    - target: {fileID: 3008066840293270908, guid: f4287571c4365ef46959a7aeb3a06cb9, type: 3}
+      propertyPath: walkSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 58270500419339f4a8536fcb9c11e912, type: 3}
+    - target: {fileID: 3008066840293270908, guid: f4287571c4365ef46959a7aeb3a06cb9, type: 3}
+      propertyPath: chaseSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 943895b7f2d9e95408b553016abb4ced, type: 3}
     - target: {fileID: 5006145624235910245, guid: f4287571c4365ef46959a7aeb3a06cb9, type: 3}
       propertyPath: speed
       value: 5
@@ -6899,6 +6911,18 @@ PrefabInstance:
       propertyPath: m_Speed
       value: 5
       objectReference: {fileID: 0}
+    - target: {fileID: 3008066840293270908, guid: f4287571c4365ef46959a7aeb3a06cb9, type: 3}
+      propertyPath: runSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 10be9821707dc9e4691eba8669e643ee, type: 3}
+    - target: {fileID: 3008066840293270908, guid: f4287571c4365ef46959a7aeb3a06cb9, type: 3}
+      propertyPath: walkSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 58270500419339f4a8536fcb9c11e912, type: 3}
+    - target: {fileID: 3008066840293270908, guid: f4287571c4365ef46959a7aeb3a06cb9, type: 3}
+      propertyPath: chaseSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 943895b7f2d9e95408b553016abb4ced, type: 3}
     - target: {fileID: 5006145624235910245, guid: f4287571c4365ef46959a7aeb3a06cb9, type: 3}
       propertyPath: speed
       value: 5
@@ -9850,7 +9874,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1119180229}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!20 &1119180233
 Camera:
   m_ObjectHideFlags: 0
@@ -13150,11 +13174,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chaseSource: {fileID: 0}
-  chaseSound: {fileID: 8300000, guid: a861bde21bb1a0548b3a605c726450c6, type: 3}
+  footstepSource: {fileID: 0}
+  chaseSound: {fileID: 8300000, guid: 943895b7f2d9e95408b553016abb4ced, type: 3}
+  walkSound: {fileID: 8300000, guid: 58270500419339f4a8536fcb9c11e912, type: 3}
+  runSound: {fileID: 8300000, guid: 10be9821707dc9e4691eba8669e643ee, type: 3}
+  stepInterval: 0.5
+  runStepInterval: 0.3
   maxDistance: 20
   minDistance: 5
   minPitch: 1
   maxPitch: 2
+  maxPanRange: 1
+  maxHearDistance: 15
+  minHearDistance: 3
 --- !u!114 &1507475929
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14749,11 +14781,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chaseSource: {fileID: 0}
-  chaseSound: {fileID: 8300000, guid: a861bde21bb1a0548b3a605c726450c6, type: 3}
+  footstepSource: {fileID: 0}
+  chaseSound: {fileID: 8300000, guid: 943895b7f2d9e95408b553016abb4ced, type: 3}
+  walkSound: {fileID: 8300000, guid: 58270500419339f4a8536fcb9c11e912, type: 3}
+  runSound: {fileID: 8300000, guid: 10be9821707dc9e4691eba8669e643ee, type: 3}
+  stepInterval: 0.5
+  runStepInterval: 0.3
   maxDistance: 20
   minDistance: 5
   minPitch: 1
   maxPitch: 2
+  maxPanRange: 1
+  maxHearDistance: 15
+  minHearDistance: 3
 --- !u!82 &1651460731
 AudioSource:
   m_ObjectHideFlags: 0
@@ -17727,11 +17767,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chaseSource: {fileID: 0}
-  chaseSound: {fileID: 8300000, guid: a861bde21bb1a0548b3a605c726450c6, type: 3}
+  footstepSource: {fileID: 0}
+  chaseSound: {fileID: 8300000, guid: 943895b7f2d9e95408b553016abb4ced, type: 3}
+  walkSound: {fileID: 8300000, guid: 58270500419339f4a8536fcb9c11e912, type: 3}
+  runSound: {fileID: 8300000, guid: 10be9821707dc9e4691eba8669e643ee, type: 3}
+  stepInterval: 0.5
+  runStepInterval: 0.3
   maxDistance: 20
   minDistance: 5
   minPitch: 1
   maxPitch: 2
+  maxPanRange: 1
+  maxHearDistance: 15
+  minHearDistance: 3
 --- !u!82 &1819592826
 AudioSource:
   m_ObjectHideFlags: 0
@@ -18815,11 +18863,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   chaseSource: {fileID: 0}
-  chaseSound: {fileID: 8300000, guid: a861bde21bb1a0548b3a605c726450c6, type: 3}
+  footstepSource: {fileID: 0}
+  chaseSound: {fileID: 8300000, guid: 943895b7f2d9e95408b553016abb4ced, type: 3}
+  walkSound: {fileID: 8300000, guid: 58270500419339f4a8536fcb9c11e912, type: 3}
+  runSound: {fileID: 8300000, guid: 10be9821707dc9e4691eba8669e643ee, type: 3}
+  stepInterval: 0.5
+  runStepInterval: 0.3
   maxDistance: 20
   minDistance: 5
   minPitch: 1
   maxPitch: 2
+  maxPanRange: 1
+  maxHearDistance: 15
+  minHearDistance: 3
 --- !u!82 &1940276628
 AudioSource:
   m_ObjectHideFlags: 0
@@ -19634,7 +19690,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2024171127}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!20 &2024171129
 Camera:
   m_ObjectHideFlags: 0
