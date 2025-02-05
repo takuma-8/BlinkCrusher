@@ -7,6 +7,7 @@ public class Life : MonoBehaviour
 {
     public Image gameOverImage;  // Inspectorで設定
     public float displayTime = 2.0f;  // 画像表示時間
+    private bool isGameOver = false;  // ゲームオーバー判定
 
     private void Start()
     {
@@ -16,6 +17,8 @@ public class Life : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (isGameOver) return;  // 既にゲームオーバーなら処理しない
+
         if (gameObject.CompareTag("Player"))
         {
             if (other.gameObject.CompareTag("Enemy2") || other.gameObject.CompareTag("Enemy1"))
@@ -27,21 +30,39 @@ public class Life : MonoBehaviour
 
     private IEnumerator TriggerGameOver()
     {
+        isGameOver = true;  // ゲームオーバーフラグを立てる
         Debug.Log("ゲームオーバー");
 
         // ゲームオーバーの画像を表示
         gameOverImage.gameObject.SetActive(true);
 
-        // プレイヤーのタグを変更
-        gameObject.tag = "not_Player";
+        // プレイヤーの操作を無効化（PlayerController がある場合）
+        PlayerController playerController = GetComponent<PlayerController>();
+        if (playerController != null)
+        {
+            playerController.enabled = false;  // プレイヤーのスクリプトを無効化
+        }
+
+        // UIボタンなどの操作をブロック
+        DisableAllUIInteractions();
 
         // ゲームをフリーズ
         Time.timeScale = 0;
 
         // 画像を表示して一定時間待機（リアルタイム時間を基準に）
         yield return new WaitForSecondsRealtime(displayTime);
-        Time.timeScale = 1;
-        // シーン遷移（フリーズを維持したまま）
+
+        Time.timeScale = 1; // シーン遷移時は通常の時間に戻す
         FadeManager.Instance.LoadScene("ResultScene", 1.0f);
+    }
+
+    private void DisableAllUIInteractions()
+    {
+        // すべてのボタンを取得して無効化
+        Button[] buttons = FindObjectsOfType<Button>();
+        foreach (Button btn in buttons)
+        {
+            btn.interactable = false;
+        }
     }
 }
