@@ -9,10 +9,13 @@ public class SceneSeni : MonoBehaviour
 {
     public string nextSceneName; // 遷移するシーン名をインスペクターで設定
 
-    void Start()
+    void Update()
     {
-        // ボタンがクリックされたらシーンを変更する処理を登録
-        GetComponent<Button>().onClick.AddListener(ChangeScene);
+        // Fire2ボタンが押されたらシーンを変更
+        if (Input.GetButtonDown("Fire2"))
+        {
+            ChangeScene();
+        }
     }
 
     public void ChangeScene()
