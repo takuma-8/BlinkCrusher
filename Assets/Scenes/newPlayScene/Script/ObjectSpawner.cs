@@ -9,7 +9,7 @@ public class ObjectSpawner : MonoBehaviour
     public GameObject[] randomObjects;
     private List<GameObject> spawnedObjects = new List<GameObject>();
     private List<Vector3> recentlyDestroyedPositions = new List<Vector3>();
-
+    public GameObject kabin2;
     public GameObject cap2;
 
     private const float minimumDistance = 1.0f;
@@ -30,7 +30,7 @@ public class ObjectSpawner : MonoBehaviour
 
     void SpawnObjects()
     {
-        Vector3 specialObjectPosition = new Vector3(0f, 1.5f, 0f);
+        Vector3 specialObjectPosition = new Vector3(0f, 0.64f, 0f); // Set height to 0.64 for kabin
         GameObject specialObject = Instantiate(kabin, specialObjectPosition, Quaternion.identity);
         specialObject.tag = "kabin";
         spawnedObjects.Add(specialObject);
@@ -43,6 +43,7 @@ public class ObjectSpawner : MonoBehaviour
             spawnedObjects.Add(newObject);
         }
     }
+
 
     Vector3 GetValidRandomPosition()
     {
@@ -106,6 +107,7 @@ public class ObjectSpawner : MonoBehaviour
 
             if (obj.CompareTag("kabin"))
             {
+                StartCoroutine(SpawnAnimationAndDestroy(obj, kabin2));
                 StartCoroutine(RespawnObjectAfterDelay(obj.transform.position, "kabin", 30f));
             }
             else if (obj.CompareTag("cap"))
@@ -120,7 +122,7 @@ public class ObjectSpawner : MonoBehaviour
     private IEnumerator SpawnAnimationAndDestroy(GameObject destroyedObject, GameObject animationPrefab)
     {
         GameObject animationObject = Instantiate(animationPrefab, destroyedObject.transform.position, Quaternion.identity);
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(3f);  // Wait for 5 seconds before destroying kabin2
         Destroy(animationObject);
     }
 

@@ -100,37 +100,22 @@ public class DestroyObjectInFront : MonoBehaviour
                     objectSpawner.RemoveSpawnedObject(collider.gameObject);
                 }
 
-                // アニメーションが存在する場合のみ再生
-                Animator objectAnimator = collider.GetComponent<Animator>();
-                if (collider.CompareTag(kabin) && objectAnimator != null)
+                if (collider.CompareTag(kabin))
                 {
-                    objectAnimator.Play("BreakKabin");  // 花瓶の壊れるアニメーション
                     score += 1000;
                     soundManager.PlayBreakSound("kabin");
                 }
                 else if (collider.CompareTag(cap))
                 {
-                    score += 100;  // 蓋の得点
+                    score += 100;
                     soundManager.PlayBreakSound("cap");
                 }
 
-                // アニメーションの長さを待機してからオブジェクトを削除
-                if (objectAnimator != null)
-                {
-                    Debug.Log("アニメーション再生");
-                    float animationLength = objectAnimator.GetCurrentAnimatorStateInfo(0).length;
-                    Destroy(collider.gameObject, animationLength);  // アニメーション終了後に削除
-                }
-                else
-                {
-                    Debug.Log("アニメーションmi再生");
-                    Destroy(collider.gameObject);  // アニメーションがない場合、即座に削除
-                }
+                Destroy(collider.gameObject);
                 break;
             }
         }
     }
-
 
     private IEnumerator DestroyAfterDelay(float delay)
     {
