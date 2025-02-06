@@ -11,7 +11,6 @@ public class ObjectSpawner : MonoBehaviour
     private List<Vector3> recentlyDestroyedPositions = new List<Vector3>();
 
     public GameObject cap2;
-    public GameObject kabin2;
 
     private const float minimumDistance = 1.0f;
     private const float spawnBlockDuration = 10f;
@@ -107,7 +106,6 @@ public class ObjectSpawner : MonoBehaviour
 
             if (obj.CompareTag("kabin"))
             {
-                StartCoroutine(SpawnAnimationAndDestroy(obj, kabin2));
                 StartCoroutine(RespawnObjectAfterDelay(obj.transform.position, "kabin", 30f));
             }
             else if (obj.CompareTag("cap"))

@@ -12,7 +12,7 @@ public class SceneSeni : MonoBehaviour
     void Update()
     {
         // Fire2ボタンが押されたらシーンを変更
-        if (Input.GetButtonDown("Fire2"))
+        if (Input.GetButtonDown("Fire1"))
         {
             ChangeScene();
         }
