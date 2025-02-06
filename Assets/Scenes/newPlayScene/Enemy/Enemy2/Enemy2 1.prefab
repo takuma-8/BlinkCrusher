@@ -265,9 +265,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chaseSource: {fileID: 0}
   footstepSource: {fileID: 0}
-  chaseSound: {fileID: 8300000, guid: a861bde21bb1a0548b3a605c726450c6, type: 3}
-  walkSound: {fileID: 8300000, guid: 7771f3ec324fc184a9c091edba4a0c83, type: 3}
-  runSound: {fileID: 8300000, guid: d20763658b593c941bd8452ed15b20cd, type: 3}
+  chaseSound: {fileID: 8300000, guid: 943895b7f2d9e95408b553016abb4ced, type: 3}
+  walkSound: {fileID: 8300000, guid: 58270500419339f4a8536fcb9c11e912, type: 3}
+  runSound: {fileID: 8300000, guid: 10be9821707dc9e4691eba8669e643ee, type: 3}
   stepInterval: 0.5
   runStepInterval: 0.3
   maxDistance: 20
@@ -275,3 +275,5 @@ MonoBehaviour:
   minPitch: 1
   maxPitch: 2
   maxPanRange: 1
+  maxHearDistance: 1000
+  minHearDistance: 1

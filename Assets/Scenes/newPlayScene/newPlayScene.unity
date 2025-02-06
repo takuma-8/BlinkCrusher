@@ -3204,6 +3204,18 @@ PrefabInstance:
       propertyPath: m_Speed
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 3008066840293270908, guid: f4287571c4365ef46959a7aeb3a06cb9, type: 3}
+      propertyPath: runSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 10be9821707dc9e4691eba8669e643ee, type: 3}
+    - target: {fileID: 3008066840293270908, guid: f4287571c4365ef46959a7aeb3a06cb9, type: 3}
+      propertyPath: walkSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 58270500419339f4a8536fcb9c11e912, type: 3}
+    - target: {fileID: 3008066840293270908, guid: f4287571c4365ef46959a7aeb3a06cb9, type: 3}
+      propertyPath: chaseSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 943895b7f2d9e95408b553016abb4ced, type: 3}
     - target: {fileID: 5006145624235910245, guid: f4287571c4365ef46959a7aeb3a06cb9, type: 3}
       propertyPath: speed
       value: 8
@@ -6201,6 +6213,18 @@ PrefabInstance:
       propertyPath: m_Speed
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 3008066840293270908, guid: f4287571c4365ef46959a7aeb3a06cb9, type: 3}
+      propertyPath: runSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 10be9821707dc9e4691eba8669e643ee, type: 3}
+    - target: {fileID: 3008066840293270908, guid: f4287571c4365ef46959a7aeb3a06cb9, type: 3}
+      propertyPath: walkSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 58270500419339f4a8536fcb9c11e912, type: 3}
+    - target: {fileID: 3008066840293270908, guid: f4287571c4365ef46959a7aeb3a06cb9, type: 3}
+      propertyPath: chaseSound
+      value: 
+      objectReference: {fileID: 8300000, guid: 943895b7f2d9e95408b553016abb4ced, type: 3}
     - target: {fileID: 5006145624235910245, guid: f4287571c4365ef46959a7aeb3a06cb9, type: 3}
       propertyPath: speed
       value: 8
@@ -11305,9 +11329,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chaseSource: {fileID: 0}
   footstepSource: {fileID: 0}
-  chaseSound: {fileID: 8300000, guid: a861bde21bb1a0548b3a605c726450c6, type: 3}
-  walkSound: {fileID: 0}
-  runSound: {fileID: 0}
+  chaseSound: {fileID: 8300000, guid: 943895b7f2d9e95408b553016abb4ced, type: 3}
+  walkSound: {fileID: 8300000, guid: 58270500419339f4a8536fcb9c11e912, type: 3}
+  runSound: {fileID: 8300000, guid: 10be9821707dc9e4691eba8669e643ee, type: 3}
   stepInterval: 0.5
   runStepInterval: 0.3
   maxDistance: 20
@@ -12807,9 +12831,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chaseSource: {fileID: 0}
   footstepSource: {fileID: 0}
-  chaseSound: {fileID: 8300000, guid: a861bde21bb1a0548b3a605c726450c6, type: 3}
-  walkSound: {fileID: 0}
-  runSound: {fileID: 0}
+  chaseSound: {fileID: 8300000, guid: 943895b7f2d9e95408b553016abb4ced, type: 3}
+  walkSound: {fileID: 8300000, guid: 58270500419339f4a8536fcb9c11e912, type: 3}
+  runSound: {fileID: 8300000, guid: 10be9821707dc9e4691eba8669e643ee, type: 3}
   stepInterval: 0.5
   runStepInterval: 0.3
   maxDistance: 20
@@ -15479,9 +15503,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chaseSource: {fileID: 0}
   footstepSource: {fileID: 0}
-  chaseSound: {fileID: 8300000, guid: a861bde21bb1a0548b3a605c726450c6, type: 3}
-  walkSound: {fileID: 0}
-  runSound: {fileID: 0}
+  chaseSound: {fileID: 8300000, guid: 943895b7f2d9e95408b553016abb4ced, type: 3}
+  walkSound: {fileID: 8300000, guid: 58270500419339f4a8536fcb9c11e912, type: 3}
+  runSound: {fileID: 8300000, guid: 10be9821707dc9e4691eba8669e643ee, type: 3}
   stepInterval: 0.5
   runStepInterval: 0.3
   maxDistance: 20
@@ -16574,9 +16598,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   chaseSource: {fileID: 0}
   footstepSource: {fileID: 0}
-  chaseSound: {fileID: 8300000, guid: a861bde21bb1a0548b3a605c726450c6, type: 3}
-  walkSound: {fileID: 0}
-  runSound: {fileID: 0}
+  chaseSound: {fileID: 8300000, guid: 943895b7f2d9e95408b553016abb4ced, type: 3}
+  walkSound: {fileID: 8300000, guid: 58270500419339f4a8536fcb9c11e912, type: 3}
+  runSound: {fileID: 8300000, guid: 10be9821707dc9e4691eba8669e643ee, type: 3}
   stepInterval: 0.5
   runStepInterval: 0.3
   maxDistance: 20
