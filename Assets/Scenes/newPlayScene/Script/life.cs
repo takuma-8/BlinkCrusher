@@ -1,18 +1,24 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.Video;
+using UnityEngine.SceneManagement;
 
 public class Life : MonoBehaviour
 {
-    public Image gameOverImage;  // Inspectorで設定
-    public float displayTime = 2.0f;  // 画像表示時間
-    private bool isGameOver = false;  // ゲームオーバー判定
+    public VideoPlayer videoPlayer;  // Inspector で設定（VideoPlayer コンポーネント）
+    public RawImage raiRawImage;  // RawImageに変更
+    public float videoDelayFrames = 120;  // 動画再生後の待機フレーム
+    private bool isGameOver = false;
 
     private void Start()
     {
-        // 初期状態で画像を非表示にする
-        gameOverImage.gameObject.SetActive(false);
+        videoPlayer.gameObject.SetActive(false);  // 最初は非表示
+        if (raiRawImage != null)
+        {
+            raiRawImage.gameObject.SetActive(false);  // 最初は非表示に設定
+        }
+        AudioListener.pause = false;
     }
 
     private void OnTriggerEnter(Collider other)
@@ -32,42 +38,41 @@ public class Life : MonoBehaviour
     {
         // 全ての効果音を消す
         AudioListener.pause = true;
-
-        isGameOver = true;  // ゲームオーバーフラグを立てる
+        isGameOver = true;
         Debug.Log("ゲームオーバー");
 
-        // ゲームオーバーの映像を表示（映像再生用オブジェクトを有効化する場合はここで）
-        gameOverImage.gameObject.SetActive(true);
+        // 動画を表示＆再生
+        videoPlayer.gameObject.SetActive(true);
+        videoPlayer.Play();
 
-        // プレイヤーの操作を無効化（PlayerController がある場合）
+        // RawImageも表示
+        if (raiRawImage != null)
+        {
+            raiRawImage.gameObject.SetActive(true);
+        }
+
+        // プレイヤー操作を無効化
         PlayerController playerController = GetComponent<PlayerController>();
         if (playerController != null)
         {
-            playerController.enabled = false;  // プレイヤーのスクリプトを無効化
+            playerController.enabled = false;
         }
 
-        // UIボタンなどの操作をブロック
+        // UIボタンを無効化
         DisableAllUIInteractions();
 
-        // 必要ならゲームをフリーズ（映像が影響を受けるなら削除）
-        // Time.timeScale = 0;
-
         // 120フレーム待機
-        for (int i = 0; i < 120; i++)
+        for (int i = 0; i < videoDelayFrames; i++)
         {
             yield return new WaitForEndOfFrame();
         }
-
-        // シーン遷移時は通常の時間に戻す
-        Time.timeScale = 1;
+        
+        // シーン遷移
         FadeManager.Instance.LoadScene("ResultScene", 1.0f);
     }
 
-
-
     private void DisableAllUIInteractions()
     {
-        // すべてのボタンを取得して無効化
         Button[] buttons = FindObjectsOfType<Button>();
         foreach (Button btn in buttons)
         {
