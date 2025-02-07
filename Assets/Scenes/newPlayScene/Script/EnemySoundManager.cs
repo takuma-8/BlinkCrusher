@@ -17,7 +17,7 @@ public class EnemySoundManager : MonoBehaviour
     public float runStepInterval = 0.3f;
 
     [Header("Sound Settings")]
-    public float maxDistance = 20f;  // Max distance at which the sound is fully heard
+    public float maxDistance = 30f;  // Max distance at which the sound is fully heard
     public float minDistance = 5f;   // Min distance at which the sound is at its loudest
     public float minPitch = 1f;      // Minimum pitch (when the player is far)
     public float maxPitch = 2f;      // Maximum pitch (when the player is close)
@@ -27,41 +27,46 @@ public class EnemySoundManager : MonoBehaviour
     private bool isChasing = false;
 
     [Header("Sound Distance Settings")]
-    public float maxHearDistance = 1000f; // 足音が聞こえる最大距離
-    public float minHearDistance = 1f;  // 最大音量になる距離
+    [SerializeField] private float maxHearDistance = 100f; // 足音が聞こえる最大距離
+    [SerializeField] private float minHearDistance = 1f;  // 最大音量になる距離
 
 
     void Start()
     {
-        // Get the player's transform
-        player = GameObject.FindGameObjectWithTag("Player").transform;
-        
-        if(player == null )
+        // プレイヤーのTransformを取得
+        player = GameObject.FindGameObjectWithTag("Player")?.transform;
+
+        if (player == null)
         {
             Debug.LogWarning("Playerタグを持つオブジェクトが見つかりません！");
             return;
         }
 
-        // Create AudioSource for chase sound
+        // AudioSourceの初期設定
         chaseSource = gameObject.AddComponent<AudioSource>();
         chaseSource.loop = true;
         chaseSource.spatialBlend = 0;
 
-        // 足音用のAudioSourceを作成
         footstepSource = gameObject.AddComponent<AudioSource>();
-        footstepSource.loop = false;  // ループしない
+        footstepSource.loop = false;
         footstepSource.playOnAwake = false;
-
-        footstepSource.spatialBlend = 1.0f; // 0 = 2D, 1 = 3D
-        footstepSource.rolloffMode = AudioRolloffMode.Linear; // 距離による音量調整
-        footstepSource.maxDistance = maxHearDistance; // これ以上離れると聞こえなくなる
-        footstepSource.minDistance = minHearDistance; // 近くで最大音量
+        footstepSource.spatialBlend = 1.0f;
+        footstepSource.rolloffMode = AudioRolloffMode.Logarithmic;
         footstepSource.volume = 1.0f;
+
+        maxHearDistance = 110f;
+
+        footstepSource.maxDistance = maxHearDistance;
+        footstepSource.minDistance = minHearDistance;
+
+        Debug.Log($"maxHearDistance 初期化: {maxHearDistance}");
     }
 
     void Update()
     {
-        if (chaseSource.isPlaying)
+        Debug.Log($"足音設定 - maxDistance: {footstepSource.maxDistance}, minDistance: {footstepSource.minDistance}");
+        Debug.Log($"プレイヤーとの距離: {Vector3.Distance(transform.position, player.position)}, maxHearDistance: {maxHearDistance}");
+        Debug.Log($"footstepSource.maxDistance: {footstepSource.maxDistance}, maxHearDistance: {maxHearDistance}"); if (chaseSource.isPlaying)
         {
             AdjustSoundPropertiesBasedOnDistance();
             AdjustStereoPan();
@@ -100,8 +105,12 @@ public class EnemySoundManager : MonoBehaviour
             float distance = Vector3.Distance(transform.position, player.position);
 
             // Adjust volume
-            float volume = Mathf.Clamp01(1 - (distance - minDistance) / (maxDistance - minDistance));
-            chaseSource.volume = volume;
+            float volume = Mathf.Clamp(
+                minHearDistance + (1 - minHearDistance) * (1 - (distance - minHearDistance) / (maxHearDistance - minHearDistance)),
+                minHearDistance,
+                1.0f
+            );
+
 
             // Adjust pitch
             float pitch = Mathf.Lerp(maxPitch, minPitch, (distance - minDistance) / (maxDistance - minDistance));
@@ -138,27 +147,40 @@ public class EnemySoundManager : MonoBehaviour
 
     private void PlayFootstepSound()
     {
-        if (Time.time >= nextStepTime && footstepSource != null)
+        if (Time.time < nextStepTime || footstepSource == null) return;
+
+        // **音量が0なら再生しない**
+        if (footstepSource.volume <= 0f)
         {
-            if (isChasing && runSound != null)
+            if (footstepSource.isPlaying)
             {
-                footstepSource.clip = runSound;
-                nextStepTime = Time.time + runStepInterval; // 追跡時の間隔
+                footstepSource.Stop();
+                Debug.Log("足音を停止（音量ゼロ）");
             }
-            else if (!isChasing && walkSound != null)
-            {
-                footstepSource.clip = walkSound;
-                nextStepTime = Time.time + stepInterval; // 通常時の間隔
-            }
-            if (footstepSource.clip == null)
-            {
-                Debug.LogWarning("足音クリップが設定されていません！");
-                return;
-            }
-            footstepSource.Play();
-            Debug.Log($"足音再生: {footstepSource.clip.name}, 音量: {footstepSource.volume}");
+            return;
         }
+
+        if (isChasing && runSound != null)
+        {
+            footstepSource.clip = runSound;
+            nextStepTime = Time.time + runStepInterval;
+        }
+        else if (!isChasing && walkSound != null)
+        {
+            footstepSource.clip = walkSound;
+            nextStepTime = Time.time + stepInterval;
+        }
+
+        if (footstepSource.clip == null)
+        {
+            Debug.LogWarning("足音クリップが設定されていません！");
+            return;
+        }
+
+        footstepSource.Play();
+        Debug.Log($"足音再生: {footstepSource.clip.name}, 音量: {footstepSource.volume}");
     }
+
 
     // 追跡開始（足音変更）
     public void SetChaseMode(bool chase)
@@ -171,16 +193,38 @@ public class EnemySoundManager : MonoBehaviour
         if (player == null) return;
 
         float distance = Vector3.Distance(transform.position, player.position);
+        Debug.Log($"プレイヤーとの距離: {distance}, maxHearDistance: {maxHearDistance}");
 
-        if (distance > maxHearDistance)
+        if (distance >= maxHearDistance)
         {
-            footstepSource.volume = 0f; // 一定距離を超えたら完全に聞こえなくする
+            if (footstepSource.isPlaying) // もし再生中なら停止
+            {
+                footstepSource.Stop();
+                Debug.Log("足音を停止しました（範囲外）");
+            }
+            footstepSource.volume = 0f;
+            return; // ここで処理を終了
         }
-        else
+
+        // 音量を計算
+        float volume = Mathf.Clamp01(1.0f - (distance - minHearDistance) / (maxHearDistance - minHearDistance));
+
+        // もし音量が 0 になったら停止（念のため）
+        if (volume <= 0f)
         {
-            float minFootstepVolume = 0.2f; // 最低音量を設定
-            float volume = Mathf.Clamp(minFootstepVolume + (1 - minFootstepVolume) * (1 - (distance - minHearDistance) / (maxHearDistance - minHearDistance)), minFootstepVolume, 1.0f);
-            footstepSource.volume = volume;
+            if (footstepSource.isPlaying)
+            {
+                footstepSource.Stop();
+                Debug.Log("足音を停止（音量ゼロ）");
+            }
+            return;
         }
+
+        footstepSource.volume = volume;
+        Debug.Log($"足音音量: {footstepSource.volume}");
     }
+
+
+
+
 }
