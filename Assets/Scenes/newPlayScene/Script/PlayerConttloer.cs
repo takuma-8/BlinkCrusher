@@ -14,6 +14,10 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        Texture2D texture = Resources.Load<Texture2D>("YourTexture");
+        Renderer renderer = GetComponent<Renderer>();
+        renderer.material.mainTexture = texture;
+
         rb = GetComponent<Rigidbody>();
         soundManager = GetComponent<PlayerSoundManager>();
 

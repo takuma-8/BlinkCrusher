@@ -61,15 +61,22 @@ public class Life : MonoBehaviour
         // UIボタンを無効化
         DisableAllUIInteractions();
 
+        // ゲームをフリーズ（時間を止める）
+        Time.timeScale = 0;
+
         // 120フレーム待機
         for (int i = 0; i < videoDelayFrames; i++)
         {
             yield return new WaitForEndOfFrame();
         }
-        
+
+        // シーン遷移前に時間を元に戻す
+        Time.timeScale = 1;
+
         // シーン遷移
         FadeManager.Instance.LoadScene("ResultScene", 1.0f);
     }
+
 
     private void DisableAllUIInteractions()
     {
