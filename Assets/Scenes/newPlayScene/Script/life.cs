@@ -36,7 +36,7 @@ public class Life : MonoBehaviour
         isGameOver = true;  // ゲームオーバーフラグを立てる
         Debug.Log("ゲームオーバー");
 
-        // ゲームオーバーの画像を表示
+        // ゲームオーバーの映像を表示（映像再生用オブジェクトを有効化する場合はここで）
         gameOverImage.gameObject.SetActive(true);
 
         // プレイヤーの操作を無効化（PlayerController がある場合）
@@ -49,15 +49,21 @@ public class Life : MonoBehaviour
         // UIボタンなどの操作をブロック
         DisableAllUIInteractions();
 
-        // ゲームをフリーズ
-        Time.timeScale = 0;
+        // 必要ならゲームをフリーズ（映像が影響を受けるなら削除）
+        // Time.timeScale = 0;
 
-        // 画像を表示して一定時間待機（リアルタイム時間を基準に）
-        yield return new WaitForSecondsRealtime(displayTime);
+        // 120フレーム待機
+        for (int i = 0; i < 120; i++)
+        {
+            yield return new WaitForEndOfFrame();
+        }
 
-        Time.timeScale = 1; // シーン遷移時は通常の時間に戻す
+        // シーン遷移時は通常の時間に戻す
+        Time.timeScale = 1;
         FadeManager.Instance.LoadScene("ResultScene", 1.0f);
     }
+
+
 
     private void DisableAllUIInteractions()
     {

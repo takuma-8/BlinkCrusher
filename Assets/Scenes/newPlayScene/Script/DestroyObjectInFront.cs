@@ -103,7 +103,7 @@ public class DestroyObjectInFront : MonoBehaviour
                 if (collider.CompareTag(kabin))
                 {
                     score += 1000;
-                    soundManager.PlayBreakSound("kabin");
+                    StartCoroutine(PlayDelayedBreakSound("kabin", 0.9f)); // 🔥 ここを変更
                 }
                 else if (collider.CompareTag(cap))
                 {
@@ -115,6 +115,12 @@ public class DestroyObjectInFront : MonoBehaviour
                 break;
             }
         }
+    }
+
+    private IEnumerator PlayDelayedBreakSound(string soundTag, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        soundManager.PlayBreakSound(soundTag);
     }
 
     private IEnumerator DestroyAfterDelay(float delay)
