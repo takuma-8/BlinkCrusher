@@ -9,8 +9,8 @@ public class ObjectSpawner : MonoBehaviour
     public GameObject[] randomObjects;
     private List<GameObject> spawnedObjects = new List<GameObject>();
     private List<Vector3> recentlyDestroyedPositions = new List<Vector3>();
-    public GameObject kabin2;
     public GameObject cap2;
+    public GameObject kabin2;
 
     private const float minimumDistance = 1.0f;
     private const float spawnBlockDuration = 10f;
