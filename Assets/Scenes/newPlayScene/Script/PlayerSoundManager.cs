@@ -17,6 +17,7 @@ public class PlayerSoundManager : MonoBehaviour
 
     void Start()
     {
+       
         // ‘«‰¹—p AudioSource
         footStepSource = gameObject.AddComponent<AudioSource>();
         footStepSource.loop = false;

@@ -12,7 +12,7 @@ public class TriggerHintUI : MonoBehaviour
 
     private void Start()
     {
-        // 親オブジェクトからPlayerTeleportを取得
+        // 親オブジェクトから PlayerTeleport を取得
         playerTeleport = GetComponentInParent<PlayerTeleport>();
 
         if (playerTeleport == null)
@@ -22,7 +22,7 @@ public class TriggerHintUI : MonoBehaviour
             return;
         }
 
-        // 初期状態でUIを非表示にする
+        // 初期状態で UI を非表示にする
         showHintSprite.enabled = false;
         hideHintSprite.enabled = false;
     }
@@ -52,20 +52,24 @@ public class TriggerHintUI : MonoBehaviour
         {
             if (isEmperor)
             {
+                // エンペラー状態なら「Bボタンで出る」のみ表示
                 showHintSprite.enabled = true;
                 hideHintSprite.enabled = false;
             }
             else if (isInRange)
             {
+                // 範囲内なら「Bボタンで隠れる」のみ表示
                 showHintSprite.enabled = false;
                 hideHintSprite.enabled = true;
             }
             else
             {
+                // どちらにも該当しなければ非表示
                 showHintSprite.enabled = false;
                 hideHintSprite.enabled = false;
             }
 
+            // 状態を更新
             previousStateIsEmperor = isEmperor;
             previousStateInRange = isInRange;
         }
