@@ -21,6 +21,16 @@ public class EnemyAi : MonoBehaviour
 
     private static bool isAnyEnemyChasing = false;
 
+    void Awake()
+    {
+        isAnyEnemyChasing = false; // シーンをまたいだらリセット
+        soundManager = GetComponent<EnemySoundManager>();
+        if (soundManager == null)
+        {
+            Debug.LogError("EnemySoundManager がアタッチされていません！");
+        }
+    }
+
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player")?.transform;  // Playerタグを持つオブジェクトを探す
@@ -41,14 +51,33 @@ public class EnemyAi : MonoBehaviour
         animator = GetComponent<Animator>();  // Animator コンポーネントを取得
     }
 
+    void StopChaseIfNoEnemies()
+    {
+        bool anyStillChasing = false;
+        foreach (EnemyAi enemy in FindObjectsOfType<EnemyAi>())
+        {
+            if (enemy.isChasing)
+            {
+                anyStillChasing = true;
+                break;
+            }
+        }
+
+        if (!anyStillChasing)
+        {
+            soundManager.StopChaseEnd();
+            isAnyEnemyChasing = false;
+            Debug.Log("StopChaseEnd() を実行！（遅延処理）");
+        }
+    }
+
     void Update()
     {
-        if (player == null) return; // Playerが存在しない場合、処理を中断
-        if (!player.CompareTag("Player")) return; // "Player"タグがない場合、追跡しない
+        if (player == null) return;
+        if (!player.CompareTag("Player")) return;
 
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
 
-        // 追跡ロジック
         if (distanceToPlayer <= chaseRange)
         {
             if (distanceToPlayer <= detectionRange)
@@ -59,7 +88,6 @@ public class EnemyAi : MonoBehaviour
                     timeSinceLastSeen = 0f;
                     soundManager.SetChaseMode(true);
 
-                    // 誰も追跡していないなら音を鳴らす
                     if (!isAnyEnemyChasing)
                     {
                         soundManager.PlayChaseStart();
@@ -75,40 +103,14 @@ public class EnemyAi : MonoBehaviour
             if (isChasing)
             {
                 isChasing = false;
-                navAgent.ResetPath();  // 追跡を停止
+                navAgent.ResetPath();
                 soundManager.SetChaseMode(false);
 
-                // 全エネミーが追跡をやめたら音を止める
-                if (isAnyEnemyChasing)
-                {
-                    bool anyStillChasing = false;
-                    foreach (EnemyAi enemy in FindObjectsOfType<EnemyAi>())
-                    {
-                        if (enemy.isChasing)
-                        {
-                            anyStillChasing = true;
-                            break;
-                        }
-                    }
-
-                    if (!anyStillChasing)
-                    {
-                        soundManager.StopChaseEnd();
-                        isAnyEnemyChasing = false;
-                        Debug.Log("StopChaseEnd() を実行！");
-                    }
-                }
-                if (isSoundPlaying && soundManager != null && isAnyEnemyChasing)
-                {
-                    soundManager.StopChaseEnd();
-                    isSoundPlaying = false;
-                    lastChaseEndTime = Time.time; // 追跡音の終了時刻を記録
-                    Debug.Log("StopChaseEnd() を実行！");
-                }
+                // **一定時間後にチェックする**
+                Invoke(nameof(StopChaseIfNoEnemies), 0.2f);
             }
         }
 
-        // 見失い処理
         if (isChasing)
         {
             timeSinceLastSeen += Time.deltaTime;
@@ -118,31 +120,12 @@ public class EnemyAi : MonoBehaviour
                 navAgent.ResetPath();
                 soundManager.SetChaseMode(false);
 
-                // 全エネミーが追跡をやめたら音を止める
-                if (isAnyEnemyChasing)
-                {
-                    bool anyStillChasing = false;
-                    foreach (EnemyAi enemy in FindObjectsOfType<EnemyAi>())
-                    {
-                        if (enemy.isChasing)
-                        {
-                            anyStillChasing = true;
-                            break;
-                        }
-                    }
-
-                    if (!anyStillChasing)
-                    {
-                        soundManager.StopChaseEnd();
-                        isAnyEnemyChasing = false;
-                        Debug.Log("StopChaseEnd() を実行！");
-                    }
-                }
+                // **一定時間後にチェックする**
+                Invoke(nameof(StopChaseIfNoEnemies), 0.2f);
             }
         }
 
-        // 💡【アニメーション制御】ここが追加部分！
-        float moveSpeed = navAgent.velocity.magnitude; // 現在の移動速度
-        animator.SetFloat("Speed", moveSpeed);  // Animator の `Speed` パラメータを更新
+        float moveSpeed = navAgent.velocity.magnitude;
+        animator.SetFloat("Speed", moveSpeed);
     }
 }
